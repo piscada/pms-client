@@ -1,0 +1,24 @@
+{
+    "name": "pms-client",
+    "version": "0.1.0",
+    "description": "PMS client library files",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://magnuguli@bitbucket.org/teampiscadacloud/pms-client.git"
+    },
+    "keywords": [
+        "pms-client",
+        "pms"
+    ],
+    "author": "Magnus Gule",
+    "license": "Piscada",
+    "homepage": "https://bitbucket.org/teampiscadacloud/pms-client#readme",
+    "dependencies": {
+        "transaction-manager": "^2.1.3",
+        "semantic-sdp": "^3.19.1"
+    }
+}
