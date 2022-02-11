@@ -7,3 +7,7 @@ To be used with multiple pms-clients (v4, v3 and pmswe)
 # Update ts
 `npx tsc`
 
+
+# Howto add keys
+https://mskutta.github.io/2018/05/25/private-npm-packages-in-bitbucket/
+
