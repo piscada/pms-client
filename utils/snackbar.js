@@ -1,5 +1,5 @@
 import './snackbar.css'
-import colorLog from '../colorLog'
+import colorLog from './colorLog'
 
 const AUTO_DISMISS = 6000
 
@@ -27,7 +27,7 @@ export const snack = {
  */
 
 // Default snackbar
-export function snackbar(msg, type = 'info', timeout = AUTO_DISMISS) {
+function snackbar(msg, type = 'info', timeout = AUTO_DISMISS) {
   const baseId = generateID(msg)
   const alreadyUp = getEl(baseId)
 
