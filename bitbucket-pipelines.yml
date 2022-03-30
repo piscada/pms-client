@@ -10,4 +10,9 @@ pipelines:
             - mv .npmrc_config .npmrc
             - export NEXUS_CREDENTIALS=$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD
             - echo -n '_auth=$NEXUS_CREDENTIALS' | openssl base64 >> .npmrc
+            - echo .npmrc
             - npm publish
+
+            # "publishConfig": {     "registry": "https://your-nexus-host/nexus/repository/npm-private/" }  
+            # npm config set registry https://your-nexus-host/nexus/repository/npm-group/ 
+            # npm adduser --registry=https://your-nexus-host/nexus/repository/npm-private/ ( provide nexux-user-name,  nexux-user-password,  nexux-user-email) npm publish .
