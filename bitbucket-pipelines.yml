@@ -1,0 +1,13 @@
+
+image: node:10.15.0
+pipelines:
+  tags:
+    "v*":
+      - step:
+          name: publish to nexus
+          script:
+            - npm version minor -m "Upgrade to %s [skip ci]"
+            - mv .npmrc_config .npmrc
+            - export NEXUS_CREDENTIALS=$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD
+            - echo -n '_auth=$NEXUS_CREDENTIALS' | openssl base64 >> .npmrc
+            - npm publish
