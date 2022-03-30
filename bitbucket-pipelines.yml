@@ -1,5 +1,5 @@
 
-image: node:16.14.2
+image: node:12.19.0
 pipelines:
   pull-requests:
     "**":
@@ -16,4 +16,4 @@ pipelines:
 
             # "publishConfig": {     "registry": "https://your-nexus-host/nexus/repository/npm-private/" }  
             # npm config set registry https://your-nexus-host/nexus/repository/npm-group/ 
-            # npm adduser --registry=https://your-nexus-host/nexus/repository/npm-private/ ( provide nexux-user-name,  nexux-user-password,  nexux-user-email) npm publish .
+            # npm adduser --registry=https://your-nexus-host/nexus/repository/npm-private/ ( provide nexux-user-name,  nexux-user-password,  nexux-user-email) npm publish .npm
