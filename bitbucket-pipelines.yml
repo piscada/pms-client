@@ -1,8 +1,8 @@
 
 image: node:16.14.2
 pipelines:
-  tags:
-    "v*":
+  pull-requests:
+    "**":
       - step:
           name: publish to nexus
           script:
@@ -10,4 +10,10 @@ pipelines:
             - mv .npmrc_config .npmrc
             - export NEXUS_CREDENTIALS=$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD
             - echo -n '_auth=$NEXUS_CREDENTIALS' | openssl base64 >> .npmrc
+            - echo .npmrc
+            - cat .npmrc
             - npm publish
+
+            # "publishConfig": {     "registry": "https://your-nexus-host/nexus/repository/npm-private/" }  
+            # npm config set registry https://your-nexus-host/nexus/repository/npm-group/ 
+            # npm adduser --registry=https://your-nexus-host/nexus/repository/npm-private/ ( provide nexux-user-name,  nexux-user-password,  nexux-user-email) npm publish .
