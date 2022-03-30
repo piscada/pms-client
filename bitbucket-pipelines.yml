@@ -9,7 +9,7 @@ pipelines:
             - npm version minor -m "Upgrade to %s [skip ci]"
             - mv .npmrc_config .npmrc
             - cat .npmrc
-            - export NEXUS_AUTH=$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD | openssl base64
+            - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - echo -e "\n_auth=$NEXUS_AUTH"  >> .npmrc
             - cat .npmrc
             - npm publish
