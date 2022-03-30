@@ -11,6 +11,7 @@ pipelines:
             - export NEXUS_CREDENTIALS=$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD
             - echo -n '_auth=$NEXUS_CREDENTIALS' | openssl base64 >> .npmrc
             - echo .npmrc
+            - cat .npmrc
             - npm publish
 
             # "publishConfig": {     "registry": "https://your-nexus-host/nexus/repository/npm-private/" }  
