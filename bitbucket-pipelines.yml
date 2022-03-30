@@ -1,5 +1,5 @@
 
-image: node:10.15.0
+image: node:16.14.2
 pipelines:
   tags:
     "v*":
