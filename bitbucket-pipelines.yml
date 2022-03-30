@@ -1,8 +1,8 @@
 
 image: node:16.14.2
 pipelines:
-  tags:
-    "v*":
+  pull-requests:
+    "**":
       - step:
           name: publish to nexus
           script:
