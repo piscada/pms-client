@@ -6,8 +6,8 @@ image: node:12.19.0
 # https://github.com/npm/cli/pull/2445
 
 pipelines:
-  pull-requests:
-    "**":
+  branches:
+    master:
       - step:
           name: Publish package => Nexus
           script:
