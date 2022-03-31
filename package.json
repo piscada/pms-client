@@ -1,6 +1,6 @@
 {
     "name": "pms-client",
-    "version": "0.3.36",
+    "version": "0.3.37",
     "description": "PMS client library files",
     "main": "index.js",
     "types": "types/index.d.ts",
