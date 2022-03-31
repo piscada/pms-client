@@ -11,7 +11,6 @@ pipelines:
       - step:
           name: publish to nexus
           script:
-            - npm version minor -m "Upgrade to %s [skip ci]"
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - echo -e "\n_auth=$NEXUS_AUTH"  >> .npmrc
