@@ -19,6 +19,7 @@
   "license": "UNLICENSED",
   "homepage": "https://bitbucket.org/teampiscadacloud/pms-client#readme",
   "dependencies": {
+    "@piscada/snackbar": "^1.0.18",
     "semantic-sdp": "^3.19.1",
     "transaction-manager": "^2.1.3"
   },
