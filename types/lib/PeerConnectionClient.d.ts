@@ -10,11 +10,11 @@ export default class PeerConnectionClient {
     strictW3C: any;
     forceSDPMunging: any;
     forceRenegotiation: any;
-    pending: any;
-    processing: any;
+    pending: Set<any>;
+    processing: Set<any>;
     renegotiating: boolean;
-    adding: any;
-    removing: any;
+    adding: Set<any>;
+    removing: Set<any>;
     ontrack: (event: any) => void;
     ontrackended: (event: any) => void;
     onstatsended: (event: any) => void;

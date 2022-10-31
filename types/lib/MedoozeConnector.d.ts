@@ -11,8 +11,8 @@ export class PMSConnector {
     url: string;
     api: string;
     isReconnecting: any;
-    cameraList: any;
-    createWebSocket(): any;
+    cameraList: Error | Promise<any>;
+    createWebSocket(): Error | Promise<any>;
     ws: WebSocket;
     tm: any;
     fetchCamList(): Promise<any>;
