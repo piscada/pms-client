@@ -13,6 +13,6 @@ Also contains own Pub/Sub to handle reconnection to PMS-server.
 
 To use, `npm i @piscada/pms-client` or `yarn add piscada@pms-client`
 
-# Update ts
+# Update package before deploy
 
 `npx tsc`
