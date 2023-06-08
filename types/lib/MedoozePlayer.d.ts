@@ -13,7 +13,7 @@ export default class MedoozePlayer {
     client: MediaServerClient;
     reconnect: () => void;
     streamPromise: Promise<any>;
-    createPeerConnection(cli: any, resolve: any): Promise<any>;
+    createPeerConnection(cli: any, resolve: any, camId: any): Promise<any>;
     stream: MediaStream;
     reConnectListener(): void;
 }
