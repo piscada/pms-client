@@ -17,47 +17,24 @@ pipelines:
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - sed -i "s|\${NEXUS_AUTH}|${NEXUS_AUTH}|g" .npmrc # Replace ${NEXUS_AUTH} with the value of NEXUS_AUTH if it is defined in the environment
             - npm install
-            - npx tsc
+            # - npx tsc
+            - echo "git diff --name-only HEAD^ HEAD"
 
             # Extract version from git tag
             - PACKAGE_VERSION=$(echo ${BITBUCKET_TAG} | sed 's/^v//')
 
             # Set package version
-            - npm version ${PACKAGE_VERSION} --no-git-tag-version
+            - npm version ${PACKAGE_VERSION} --no-git-tag-version -m "Setting pkg version to %s [skip ci]"
+            - git push && git push --tags
             - cat package.json
 
-            # Create and checkout a temporary branch
-            - git checkout -b temp_branch
 
             # Generate buildInfo.json
             - chmod +x generate_client_info.sh
             - ./generate_client_info.sh
 
-            # Add changes made by npm version to git
-            - git add package.json package-lock.json clientInfo.json
-
-            # Commit the version change
-            - git commit -m "Set package version to ${PACKAGE_VERSION}"
-
-            # Push changes to the temporary branch
-            - git push origin temp_branch
-
-            # Fetch the master branch
-            - git fetch origin master
-            - git fetch -a
-
-            # Checkout and merge temp_branch into master
-            - git merge temp_branch --no-edit
-
-            # Push changes to master
-            - git push origin master
 
             # Publish the package
             - npm publish
 
-            # Push the changes to the repository
-            - git push
-
-            # After publishing, clean up by deleting the temporary branch
-            - git checkout master
-            - git branch -D temp_branch
+    
