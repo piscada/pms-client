@@ -2,7 +2,7 @@ image: node:16.18.0
 
 pipelines:
   branches:
-    version-temp-branch:
+    disabled:
       - step:
           name: Merge and publish pkg
           caches:
@@ -25,7 +25,7 @@ pipelines:
   tags:
     "v*.*.*":
       - step:
-          name: Build, test and deploy to @piscada/pms-client package in Nexus
+          name: Build, test and deploy pkg
           caches:
             - node
           script:
@@ -48,17 +48,12 @@ pipelines:
             # Generate buildInfo.json
             - chmod +x && ./generate_client_info.sh
 
-            # Test this
-            - git status
-
-            - git checkout -b version-temp-branch
+            # Need remote ref 
+            - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            - git fetch origin -a
+            - git checkout master
 
             # Add and commit package.json and package-lock.json version changes
             - git add package.json package-lock.json clientInfo.json
             - git commit -m "Bump version to $PACKAGE_VERSION"
-
-            # Check things
-            - git status
-
-            # Push changes to the current branch
-            - git push origin HEAD:version-temp-branch
+            - git push origin master
