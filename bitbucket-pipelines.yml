@@ -18,6 +18,22 @@ pipelines:
             - sed -i "s|\${NEXUS_AUTH}|${NEXUS_AUTH}|g" .npmrc # Replace ${NEXUS_AUTH} with the value of NEXUS_AUTH if it is defined in the environment
             - npm install
             - npx tsc
+
+            # Extract version from git tag
+            - PACKAGE_VERSION=$(echo ${BITBUCKET_TAG} | sed 's/^v//')
+
+            # Set package version
+            - npm version ${PACKAGE_VERSION} --no-git-tag-version
+
+            # Generate buildInfo.json
             - chmod +x generate_build_info.sh
             - ./generate_build_info.sh
+
+            # Add changes made by npm version to git
+            - git add package.json package-lock.json buildInfo.json
+
+            # Commit the version change
+            - git commit -m "Set package version to ${PACKAGE_VERSION}"
+
+            # Publish the package
             - npm publish
