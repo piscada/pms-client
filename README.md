@@ -36,5 +36,6 @@ To use
 
 
 - ~~PMS compatibilty check~~ 
+- Add examples (for now check integration in WebPMP v3 and PMSWE)
 - Rewrite to typescript
 - Tests
