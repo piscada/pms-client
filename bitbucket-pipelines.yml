@@ -28,6 +28,9 @@ pipelines:
 
             # Generate buildInfo.json
             - chmod +x generate_client_info.sh && ./generate_client_info.sh
+            - TEMP_BRANCH=$(echo ${BITBUCKET_TAG}-merge)
+            # Commit the changes
+            - git checkout -b $TEMP_BRANCH $BITBUCKET_TAG
 
             # Add and commit package.json and package-lock.json version changes
             - git add package.json package-lock.json clientInfo.json
