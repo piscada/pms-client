@@ -2,17 +2,39 @@
 
 Library files for creating WebRTC connection to PMS-server:
 exports:
-MediaServerClient
-MedoozeConnector
-MedoozePlayer
-PeerConnectionClient
+- MediaServerClient
+- MedoozeConnector
+- MedoozePlayer
+- PeerConnectionClient
+- clientInfo.json
 
-Also contains own Pub/Sub to handle reconnection to PMS-server.
+Also contains a small Pub/Sub (lib/yaps.js) to handle reconnection to PMS-server.
 
-# Install
+## Deployment compatibility
 
-To use, `npm i @piscada/pms-client` or `yarn add piscada@pms-client`
+When pushing to `master` branch pipeline automatically patches `x.y.(z+1)` e.g. `2.6.3` => `2.6.4`
 
-# Update package before deploy
+If the PMS-server has done upgrades, the **equivalent version** should also be upped in the pms-client, so **they are the same**
 
-`npx tsc`
+| PMS version | PMS client |
+| ----------- | ------- |
+| v2.4.9 >=   | Legacy (broken)|
+| v.2.6.1     | v2.6.1     |
+
+### Warnings
+The pms-client will show warnings in the console if there are old/miss-aligned versions between the PMS and pms-client.
+
+## Use package
+
+To use
+
+    npm i @piscada/pms-client
+    
+    yarn add piscada@pms-client
+
+## Future improvements
+
+
+- ~~PMS compatibilty check~~ 
+- Rewrite to typescript
+- Tests

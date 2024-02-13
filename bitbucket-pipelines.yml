@@ -11,9 +11,12 @@ pipelines:
       - step:
           name: Publish package => Nexus
           script:
+            - npx tsc
             - npm version patch -m "Upgrade to %s [skip ci]"
             - git push && git push --tags
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - echo -e "\n_auth=$NEXUS_AUTH"  >> .npmrc
+            - chmod +x generate_build_info.sh
+            - ./generate_build_info.sh
             - npm publish
