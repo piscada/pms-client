@@ -15,6 +15,7 @@ export class PMSConnector {
     createWebSocket(): Error | Promise<any>;
     ws: WebSocket;
     tm: any;
+    checkBuildVersion(): Promise<void>;
     fetchCamList(): Promise<any>;
     reconnectWebSocket(settings: any): void;
 }

@@ -6,7 +6,7 @@ exports:
 - MedoozeConnector
 - MedoozePlayer
 - PeerConnectionClient
-- clientInfo.json
+- clientInfo.js
 
 Also contains a small Pub/Sub (lib/yaps.js) to handle reconnection to PMS-server.
 
