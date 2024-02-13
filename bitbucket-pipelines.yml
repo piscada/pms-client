@@ -2,7 +2,7 @@ image: node:16.18.0
 
 pipelines:
   tags:
-    "v.*.*.*":
+    "v*.*.*":
       - step:
           name: Build, test and deploy to @piscada/pms-client package in Nexus
           caches:
