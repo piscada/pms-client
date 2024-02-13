@@ -24,6 +24,7 @@ pipelines:
 
             # Set package version
             - npm version ${PACKAGE_VERSION} --no-git-tag-version
+            - cat package.json
 
             # Generate buildInfo.json
             - chmod +x generate_client_info.sh
@@ -34,6 +35,9 @@ pipelines:
 
             # Commit the version change
             - git commit -m "Set package version to ${PACKAGE_VERSION}"
+
+            # Push the changes to the repository
+            - git push
 
             # Publish the package
             - npm publish
