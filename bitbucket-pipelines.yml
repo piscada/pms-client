@@ -21,7 +21,7 @@ pipelines:
           caches:
             - node
           script:
-            - git status
+            - git fetch --all --tags --prune
             # Ensure the tag follows the semantic versioning format (vX.Y.Z)
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
