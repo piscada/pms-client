@@ -42,9 +42,11 @@ pipelines:
             # Push changes to the temporary branch
             - git push origin temp_branch
 
-            # Merge temp_branch into master
+            # Fetch the master branch
             - git fetch origin master
-            - git checkout master
+
+            # Checkout and merge temp_branch into master
+            - git checkout -b master origin/master
             - git merge temp_branch --no-edit
 
             # Push changes to master
