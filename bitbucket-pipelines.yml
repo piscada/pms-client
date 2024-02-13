@@ -1,40 +1,41 @@
-
-image: node:12.19.0
-
-# NOTE: There is a bug with later LTS/latest node 
-# Use this just for publishing instead
-# https://github.com/npm/cli/pull/2445
+image: node:16.18.0
 
 pipelines:
-  tags:
-    'v*':
+  branches:
+    master:
       - step:
           name: Build, test and deploy to @piscada/pms-client package in Nexus
           caches:
             - node
           script:
+            # Ensure the tag follows the semantic versioning format (vX.Y.Z)
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - sed -i "s|\${NEXUS_AUTH}|${NEXUS_AUTH}|g" .npmrc # Replace ${NEXUS_AUTH} with the value of NEXUS_AUTH if it is defined in the environment
             - npm install
-            # - npx tsc
-            - echo "git diff --name-only HEAD^ HEAD"
+
+            # Check for bitbucket tag
+            - if [ -z "$BITBUCKET_TAG" ]; then echo "No tag found"; else echo "Tag found"; fi
+            - chmod +x check_bitbucket_tag.sh && ./check_bitbucket_tag.sh
 
             # Extract version from git tag
             - PACKAGE_VERSION=$(echo ${BITBUCKET_TAG} | sed 's/^v//')
 
             # Set package version
-            - npm version ${PACKAGE_VERSION} --no-git-tag-version -m "Setting pkg version to %s [skip ci]"
-            - git push && git push --tags
-            - cat package.json
-
+            - npm version ${PACKAGE_VERSION} --no-git-tag-version
 
             # Generate buildInfo.json
-            - chmod +x generate_client_info.sh
-            - ./generate_client_info.sh
+            - chmod +x generate_client_info.sh && ./generate_client_info.sh
 
+            # Add and commit package.json and package-lock.json version changes
+            - git add package.json package-lock.json clientInfo.json
+            - git commit -m "Bump version to $PACKAGE_VERSION"
+
+            # Check things
+            - git status
+
+            # Push changes to the current branch
+            - git push origin HEAD:$BITBUCKET_BRANCH
 
             # Publish the package
             - npm publish
-
-    
