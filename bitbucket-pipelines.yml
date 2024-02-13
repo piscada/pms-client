@@ -26,11 +26,11 @@ pipelines:
             - npm version ${PACKAGE_VERSION} --no-git-tag-version
 
             # Generate buildInfo.json
-            - chmod +x generate_build_info.sh
-            - ./generate_build_info.sh
+            - chmod +x generate_client_info.sh
+            - ./generate_client_info.sh
 
             # Add changes made by npm version to git
-            - git add package.json package-lock.json buildInfo.json
+            - git add package.json package-lock.json clientInfo.json
 
             # Commit the version change
             - git commit -m "Set package version to ${PACKAGE_VERSION}"
