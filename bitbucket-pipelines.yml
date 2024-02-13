@@ -15,7 +15,9 @@ pipelines:
             - npm publish
             # Delete temporary branch
             - git branch -a
+            - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
             - git fetch origin -a
+            - git branch -a
             - git checkout master
             - git merge version-temp-branch --no-edit
             - git branch -d version-temp-branch
