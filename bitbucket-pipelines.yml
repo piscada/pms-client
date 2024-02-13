@@ -1,6 +1,19 @@
 image: node:16.18.0
 
 pipelines:
+  custom:
+    publish-package: #name of this pipeline
+      - variables: #list variable names under here
+          - name: Tag
+      - step:
+          name: Publish package
+          caches:
+            - node
+          script:
+            - git fetch --all --tags --prune
+            - git checkout $Tag
+            - npm publish
+
   tags:
     "v*.*.*":
       - step:
@@ -8,7 +21,6 @@ pipelines:
           caches:
             - node
           script:
-            # Check things
             - git status
             # Ensure the tag follows the semantic versioning format (vX.Y.Z)
             - mv .npmrc_config .npmrc
@@ -28,9 +40,9 @@ pipelines:
 
             # Generate buildInfo.json
             - chmod +x generate_client_info.sh && ./generate_client_info.sh
-            - TEMP_BRANCH=$(echo ${BITBUCKET_TAG}-merge)
-            # Commit the changes
-            - git checkout -b $TEMP_BRANCH $BITBUCKET_TAG
+
+            # Test this
+            - git status
 
             # Add and commit package.json and package-lock.json version changes
             - git add package.json package-lock.json clientInfo.json
@@ -40,7 +52,9 @@ pipelines:
             - git status
 
             # Push changes to the current branch
-            - git push origin HEAD:$BITBUCKET_BRANCH
+            - git branch my-temporary-work
+            - git checkout master
+            - git merge my-temporary-work
 
-            # Publish the package
-            - npm publish
+            # Delete temporary branch
+            - git branch -d my-temporary-work
