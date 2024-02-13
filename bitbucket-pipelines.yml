@@ -6,15 +6,13 @@ image: node:12.19.0
 # https://github.com/npm/cli/pull/2445
 
 pipelines:
-  branches:
-    master:
+  tags:
+    'v*':
       - step:
-          name: Build, test and deploy to Nexus
+          name: Build, test and deploy to @piscada/pms-client package in Nexus
           caches:
             - node
           script:
-            - npm version patch -m "Upgrade to %s [skip ci]"
-            - git push && git push --tags
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
             - sed -i "s|\${NEXUS_AUTH}|${NEXUS_AUTH}|g" .npmrc # Replace ${NEXUS_AUTH} with the value of NEXUS_AUTH if it is defined in the environment

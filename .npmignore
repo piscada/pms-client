@@ -1,0 +1,5 @@
+bitbucket-pipelines.yml
+.prettierrc.json
+.vscode
+generated_build_info.sh
+tsconfig.json
