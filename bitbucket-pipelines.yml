@@ -1,18 +1,16 @@
 image: node:16.18.0
 
 pipelines:
-  custom:
-    publish-package: #name of this pipeline
-      - variables: #list variable names under here
-          - name: Tag
+  branches:
+    version-temp-branch:
       - step:
-          name: Publish package
+          name: Merge and publish pkg
           caches:
             - node
           script:
-            - git fetch --all --tags --prune
-            - git checkout $Tag
             - npm publish
+            # Delete temporary branch
+            - git branch -d version-temp-branch
 
   tags:
     "v*.*.*":
@@ -21,7 +19,6 @@ pipelines:
           caches:
             - node
           script:
-            - git fetch --all --tags --prune
             # Ensure the tag follows the semantic versioning format (vX.Y.Z)
             - mv .npmrc_config .npmrc
             - NEXUS_AUTH=$(echo -n "$NEXUS_NPM_PUBLISH_USERNAME:$NEXUS_NPM_PUBLISH_PASSWORD" | openssl enc -base64)
@@ -52,9 +49,5 @@ pipelines:
             - git status
 
             # Push changes to the current branch
-            - git branch my-temporary-work
-            - git checkout master
-            - git merge my-temporary-work
-
-            # Delete temporary branch
-            - git branch -d my-temporary-work
+            - git branch version-temp-branch
+            - git push
