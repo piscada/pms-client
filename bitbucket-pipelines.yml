@@ -34,7 +34,7 @@ pipelines:
 
             # Check for bitbucket tag
             - if [ -z "$BITBUCKET_TAG" ]; then echo "No tag found"; else echo "Tag found"; fi
-            - ./check_bitbucket_tag.sh
+            - chmod +x && ./check_bitbucket_tag.sh
 
             # Extract version from BITBUCKET_TAG tag
             - PACKAGE_VERSION=$(echo ${BITBUCKET_TAG} | sed 's/^v//')
@@ -43,7 +43,7 @@ pipelines:
             - npm version ${PACKAGE_VERSION} --no-git-tag-version
 
             # Generate buildInfo.json
-            - ./generate_client_info.sh
+            - chmod +x && ./generate_client_info.sh
 
             # Test this
             - git status
