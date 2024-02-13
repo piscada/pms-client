@@ -14,6 +14,7 @@ pipelines:
             - sed -i "s|\${NEXUS_AUTH}|${NEXUS_AUTH}|g" .npmrc # Replace ${NEXUS_AUTH} with the value of NEXUS_AUTH if it is defined in the environment
             - npm publish
             # Delete temporary branch
+            - git branch -a
             - git fetch origin -a
             - git checkout master
             - git merge version-temp-branch --no-edit
