@@ -41,6 +41,8 @@ pipelines:
             # Test this
             - git status
 
+            - git checkout -b version-temp-branch
+
             # Add and commit package.json and package-lock.json version changes
             - git add package.json package-lock.json clientInfo.json
             - git commit -m "Bump version to $PACKAGE_VERSION"
@@ -49,5 +51,4 @@ pipelines:
             - git status
 
             # Push changes to the current branch
-            - git branch version-temp-branch
-            - git push
+            - git push origin HEAD:version-temp-branch
