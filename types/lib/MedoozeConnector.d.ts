@@ -11,11 +11,17 @@ export class PMSConnector {
     url: string;
     api: string;
     isReconnecting: any;
+    clientInfo: {
+        buildDate: string;
+        version: string;
+    };
+    majorMinor: string;
+    compatible: boolean;
     cameraList: Error | Promise<any>;
     createWebSocket(): Error | Promise<any>;
     ws: WebSocket;
     tm: any;
-    checkBuildVersion(): Promise<void>;
+    checkBuildVersion(): Promise<boolean>;
     fetchCamList(): Promise<any>;
     reconnectWebSocket(settings: any): void;
 }
