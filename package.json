@@ -20,8 +20,8 @@
   "homepage": "https://bitbucket.org/teampiscadacloud/pms-client#readme",
   "dependencies": {
     "@piscada/snackbar": "^1.0.18",
-    "semantic-sdp": "^3.19.1",
-    "transaction-manager": "^2.1.3"
+    "semantic-sdp": "^3.27.1",
+    "transaction-manager": "^2.1.7"
   },
   "devDependencies": {
     "typescript": "^4.5.5"
