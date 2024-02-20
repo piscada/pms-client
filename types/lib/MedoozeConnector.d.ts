@@ -15,7 +15,7 @@ export class PMSConnector {
         buildDate: string;
         version: string;
     };
-    majorMinor: string;
+    requiredVersion: string;
     compatible: boolean;
     cameraList: Error | Promise<any>;
     createWebSocket(): Error | Promise<any>;
