@@ -1,11 +1,12 @@
 {
   "name": "@piscada/pms-client",
-  "version": "2.6.12",
+  "version": "2.6.16",
   "description": "PMS client library files",
   "main": "index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "deploy": "npm version patch --no-git-tag-version && generate_client_info.sh && git add . && git commit -m 'test-build' && git push && npm publish"
   },
   "repository": {
     "type": "git",
