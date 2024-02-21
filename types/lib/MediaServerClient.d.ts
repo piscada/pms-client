@@ -1,9 +1,16 @@
+import PeerConnectionClient from './PeerConnectionClient.js';
+import TransactionManager from 'transaction-manager';
+interface Options {
+    sdpSemantics?: string;
+    strictW3C?: boolean;
+    forceSDPMunging?: boolean;
+}
 export default class MediaServerClient {
-    constructor(tm: any);
-    tm: any;
+    tm: TransactionManager;
     ns: any;
-    createManagedPeerConnection(options: any): Promise<PeerConnectionClient>;
+    constructor(tm: TransactionManager);
+    createManagedPeerConnection(options?: Options): Promise<PeerConnectionClient>;
     stop(): void;
 }
-import PeerConnectionClient from "./PeerConnectionClient.js";
+export {};
 //# sourceMappingURL=MediaServerClient.d.ts.map

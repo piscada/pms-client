@@ -1,17 +1,47 @@
-import { snackbar, debug, success, warning } from '@piscada/snackbar'
+import { snack, debug, success, warning } from '@piscada/snackbar'
 import TransactionManager from 'transaction-manager'
-import { fetchAllCamerasWithInstances } from './api'
+import { PmsCameraItem, fetchAllCamerasWithInstances } from './api'
 import yaps from './yaps'
 import clientInfo from '../clientInfo'
 import { extractMajorMinorVersion, compareMinorVersions } from './helpers'
 
+interface PMSConnectorSettings {
+  host: string
+  httpOnly?: boolean
+  token: string
+  port?: number
+  isCloudServer: boolean
+  retries?: number
+  isReconnecting?: boolean
+}
+
+interface ClientInfo {
+  buildDate: string
+  version: string
+}
+
 export class PMSConnector {
-  // Check that not duplicate PMS-inits exist for this server
-  constructor(settings) {
+  settings: PMSConnectorSettings
+  host: string
+  httpOnly: boolean
+  token: string
+  port: number
+  isCloudServer: boolean
+  url: string
+  api: string
+  isReconnecting?: boolean
+  clientInfo: ClientInfo
+  requiredVersion: string
+  compatible: boolean | null
+  ws: WebSocket | null
+  tm: TransactionManager | null
+  cameraList: Promise<any>
+
+  constructor(settings: PMSConnectorSettings) {
     this.serverConnect(settings)
   }
 
-  serverConnect(settings) {
+  serverConnect(settings: PMSConnectorSettings) {
     const {
       host,
       httpOnly = true,
@@ -22,7 +52,6 @@ export class PMSConnector {
       isReconnecting
     } = settings
 
-    // Sets default retries first time
     if (retries === undefined) {
       settings.retries = 10
     }
@@ -32,10 +61,7 @@ export class PMSConnector {
     const url = `ws${secure}://${host}:${port}`
     const api = `http${secure}://${host}:${port}/api/v1`
 
-    // Store vars
-
     this.settings = settings
-
     this.host = host
     this.httpOnly = httpOnly
     this.token = token
@@ -48,25 +74,19 @@ export class PMSConnector {
     this.requiredVersion = extractMajorMinorVersion(clientInfo.version)
     this.compatible = null
 
-    // Create websocket connection to PMS
     if (isReconnecting) {
       this.cameraList = this.createWebSocket()
     }
   }
 
-  createWebSocket() {
-    try {
-      return new Promise((resolve) => {
-        // Connect with websocket
+  createWebSocket(): Promise<any> {
+    return new Promise((resolve) => {
+      try {
         this.ws = new WebSocket(this.url + '?token=' + this.token, 'rtsp')
-
-        // Crete transaction manager
         this.tm = new TransactionManager(this.ws)
 
-        // Start on open
         this.ws.onopen = async () => {
           this.compatible = await this.checkBuildVersion()
-
           const camList = await this.fetchCamList()
 
           if (this.isReconnecting) {
@@ -78,11 +98,8 @@ export class PMSConnector {
           resolve(camList)
         }
 
-        // On socket close
         this.ws.onclose = () => {
-          snackbar('Websocket closed', 'error')
-
-          // If found , Try to reconnect
+          snack.error('Websocket closed')
           if (this.settings.retries > 0) {
             this.reconnectWebSocket(this.settings)
           } else {
@@ -91,13 +108,13 @@ export class PMSConnector {
             )
           }
         }
-      })
-    } catch (error) {
-      return new Error(error)
-    }
+      } catch (error) {
+        return new Error(error)
+      }
+    })
   }
 
-  async checkBuildVersion() {
+  async checkBuildVersion(): Promise<boolean> {
     try {
       const response = await fetch(this.api + '/config/version', {
         headers: {
@@ -126,31 +143,23 @@ export class PMSConnector {
     }
   }
 
-  async fetchCamList() {
-    let camList = []
-
-    // If PMCS
+  async fetchCamList(): Promise<any> {
+    let camList: PmsCameraItem[] = []
     if (this.isCloudServer) {
       camList = await fetchAllCamerasWithInstances(this.api, this.token)
       console.log('cloud fetch', { camList })
-    }
-
-    // If PMS
-    else {
+    } else {
       const response = await fetch(this.api + '/cameras', {
         headers: {
           Authorization: 'bearer ' + this.token
         }
       })
-
-      // Add cameralist
       camList = await response.json()
     }
-
     return camList
   }
 
-  reconnectWebSocket(settings) {
+  reconnectWebSocket(settings: PMSConnectorSettings) {
     settings.retries--
     settings.isReconnecting = true
 
@@ -163,7 +172,7 @@ export class PMSConnector {
   }
 }
 
-export default async function MedoozeConnector(settings) {
+export default async function MedoozeConnector(settings: PMSConnectorSettings) {
   const o = new PMSConnector(settings)
   o.cameraList = await o.createWebSocket()
   return o

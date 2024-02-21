@@ -10,7 +10,10 @@
  * console.log(compareMinorVersions(version1, version2)) // Output will be false
  */
 
-export function compareMinorVersions(version1, version2) {
+export function compareMinorVersions(
+  version1: string,
+  version2: string
+): boolean {
   // Extracting minor versions from the version strings
   const minorVersion1 = getVersionPart(version1, 1)
   const minorVersion2 = getVersionPart(version2, 1)
@@ -20,7 +23,10 @@ export function compareMinorVersions(version1, version2) {
 }
 
 // Helper function to extract a specific part of the version string
-export function getVersionPart(version, partIndex) {
+export function getVersionPart(
+  version: string,
+  partIndex: number
+): string | null {
   const parts = version.split('.')
   if (parts.length > partIndex) {
     return parts[partIndex]
@@ -29,7 +35,7 @@ export function getVersionPart(version, partIndex) {
   }
 }
 
-export function extractMajorMinorVersion(versionString) {
+export function extractMajorMinorVersion(versionString: string): string {
   // Split the version string by dot delimiter
   let parts = versionString.split('.')
 

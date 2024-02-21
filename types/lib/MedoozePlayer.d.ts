@@ -1,21 +1,34 @@
+import MediaServerClient from './MediaServerClient';
+import TransactionManager from 'transaction-manager';
+import PeerConnectionClient from './PeerConnectionClient';
+interface PlayerConfig {
+    id: string;
+    pms: {
+        ws: WebSocket;
+        tm: any;
+    };
+    instanceID: string;
+    panelNumber?: number;
+    onReconnect?: Function;
+}
 export default class MedoozePlayer {
-    constructor(config: any);
-    createPlayer(config: any): void;
-    id: any;
-    onReconnect: any;
-    instanceID: any;
-    panelNumber: any;
-    pc: any;
-    ws: any;
-    tm: any;
-    viewerId: any;
-    stop(): void;
+    id: string;
+    onReconnect?: Function;
+    instanceID: string;
+    panelNumber: number;
+    pcc: PeerConnectionClient;
+    ws: WebSocket;
+    tm: TransactionManager;
+    viewerId: string | null;
     client: MediaServerClient;
+    streamPromise: Promise<MediaStream | null>;
+    stream: MediaStream | null;
     reconnect: () => void;
-    streamPromise: Promise<any>;
-    createPeerConnection(cli: any, resolve: any, camId: any): Promise<any>;
-    stream: MediaStream;
+    constructor(config: PlayerConfig);
+    createPlayer(config: PlayerConfig): void;
+    createPeerConnection(cli: MediaServerClient, resolve: Function, camId: string): Promise<PeerConnectionClient>;
+    stop(): void;
     reConnectListener(): void;
 }
-import MediaServerClient from "./MediaServerClient";
+export {};
 //# sourceMappingURL=MedoozePlayer.d.ts.map

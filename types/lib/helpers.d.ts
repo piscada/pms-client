@@ -9,7 +9,7 @@
  * const version2 = 'v1.3.4'
  * console.log(compareMinorVersions(version1, version2)) // Output will be false
  */
-export function compareMinorVersions(version1: string, version2: string): boolean;
-export function getVersionPart(version: any, partIndex: any): any;
-export function extractMajorMinorVersion(versionString: any): string;
+export declare function compareMinorVersions(version1: string, version2: string): boolean;
+export declare function getVersionPart(version: string, partIndex: number): string | null;
+export declare function extractMajorMinorVersion(versionString: string): string;
 //# sourceMappingURL=helpers.d.ts.map

@@ -1,15 +1,49 @@
-/* eslint-disable no-console */
 import { info, success } from '@piscada/snackbar'
 import MediaServerClient from './MediaServerClient'
 import yaps from './yaps'
+import TransactionManager from 'transaction-manager'
+import PeerConnectionClient from './PeerConnectionClient'
+import { PMSConnector } from './MedoozeConnector'
+
+interface PlayerConfig {
+  id: string
+  pms: {
+    ws: WebSocket
+    tm: any // You should replace `any` with the actual type of `tm`
+  }
+  instanceID: string
+  panelNumber?: number
+  onReconnect?: Function
+}
+
+interface TransactionManagerError {
+  error?: string
+}
+
+interface ViewResponse extends TransactionManagerError {
+  viewerId?: string
+}
 
 export default class MedoozePlayer {
-  constructor(config) {
+  id: string
+  onReconnect?: Function
+  instanceID: string
+  panelNumber: number
+  pcc: PeerConnectionClient
+  ws: WebSocket
+  tm: TransactionManager // You should replace `any` with the actual type of `tm`
+  viewerId: string | null
+  client: MediaServerClient
+  streamPromise: Promise<MediaStream | null>
+  stream: MediaStream | null
+  reconnect: () => void
+
+  constructor(config: PlayerConfig) {
     // Constructor
     this.createPlayer(config)
   }
 
-  createPlayer(config) {
+  createPlayer(config: PlayerConfig) {
     const { id, pms, instanceID, panelNumber = 1, onReconnect } = config
 
     this.id = id
@@ -17,7 +51,7 @@ export default class MedoozePlayer {
     this.instanceID = instanceID
     this.panelNumber = panelNumber
 
-    this.pc = null
+    this.pcc = null
     this.ws = pms.ws
     this.tm = pms.tm
     this.viewerId = null
@@ -30,26 +64,35 @@ export default class MedoozePlayer {
     // Auto reconnect listener if onReconnect is enabled
     if (onReconnect) {
       this.reconnect = () => {
-        if (this.pc && this.client) this.reConnectListener()
+        if (this.pcc && this.client) this.reConnectListener()
       }
       this.ws.addEventListener('close', this.reconnect, { once: true })
     }
 
     // Important one here:
-    // Need to resolve this.streamPromsise to get srcObject
+    // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
       ;(async () => {
         try {
-          const pc = await this.createPeerConnection(this.client, resolve, this.id)
-          this.pc = pc
+          const pcc = await this.createPeerConnection(
+            this.client,
+            resolve,
+            this.id
+          )
+          this.pcc = pcc
 
-          const res = await this.tm.cmd('view', {
+          const res: ViewResponse = await this.tm.cmd('view', {
             id: this.id,
             instance: this.instanceID,
-            pcId: pc.id
+            pcId: pcc.id
           })
           console.log({ response: res })
+
+          if (res.error) {
+            return reject(res.error)
+          }
+
           this.viewerId = res.viewerId
         } catch (err) {
           return reject(err)
@@ -58,12 +101,16 @@ export default class MedoozePlayer {
     })
   }
 
-  async createPeerConnection(cli, resolve, camId) {
-    let pc = null
-    pc = await cli.createManagedPeerConnection()
+  async createPeerConnection(
+    cli: MediaServerClient,
+    resolve: Function,
+    camId: string
+  ) {
+    let pcc: PeerConnectionClient
+    pcc = await cli.createManagedPeerConnection()
 
     // On new remote tracks
-    pc.ontrack = (event) => {
+    pcc.ontrack = (event) => {
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
@@ -71,7 +118,7 @@ export default class MedoozePlayer {
       }
     }
 
-    return pc
+    return pcc
   }
 
   stop() {
@@ -90,21 +137,21 @@ export default class MedoozePlayer {
     this.client.ns !== null && this.client.stop()
 
     // Closing the PeerConnection directly. No need to wait for ontrackended.
-    this.pc && this.pc.close() // WORKS
+    this.pcc && this.pcc.close() // WORKS
   }
 
   reConnectListener() {
     const delay = this.panelNumber * 1000
 
     // Subscribe to when pms reconnects
-    const id = yaps.subscribe('pms_reconnect', (freshPMS) => {
+    const id = yaps.subscribe('pms_reconnect', (freshPMS: PMSConnector) => {
       success(`New WS found. Connecting ${this.id} in ${delay}ms`, 'success')
 
       setTimeout(() => {
         // Remove the subscription
         yaps.unsubscribe(id)
 
-        // Clean up pc and client
+        // Clean up pcc and client
         this.stop()
 
         // Recreate the player, and thus "this"
@@ -117,7 +164,7 @@ export default class MedoozePlayer {
         })
 
         // Use callback to set the srcObject
-        this.onReconnect(this)
+        this.onReconnect?.(this)
       }, delay)
     })
 
