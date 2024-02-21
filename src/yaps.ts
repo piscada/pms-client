@@ -1,5 +1,7 @@
+import { PMSConnector } from './MedoozeConnector'
+
 interface Subscriber {
-  func: (...args: any[]) => void
+  func: (...args: PMSConnector[]) => void
   token: string
 }
 
@@ -8,9 +10,9 @@ interface Topics {
 }
 
 interface Yaps {
-  subscribe: (topic: string, func: (...args: any[]) => void) => string
+  subscribe: (topic: string, func: (...args: PMSConnector[]) => void) => string
   unsubscribe: (token: string) => Yaps
-  publish: (topic: string, ...rest: any[]) => Yaps
+  publish: (topic: string, ...rest: PMSConnector[]) => Yaps
 }
 
 const yapsInstance: Yaps = (function (): Yaps {
@@ -18,7 +20,10 @@ const yapsInstance: Yaps = (function (): Yaps {
   const topics: Topics = {}
   let subscriberIdentifier = -1
 
-  yaps.subscribe = (topic: string, func: (...args: any[]) => void): string => {
+  yaps.subscribe = (
+    topic: string,
+    func: (...args: PMSConnector[]) => void
+  ): string => {
     if (!topics[topic]) {
       topics[topic] = []
     }
@@ -34,7 +39,7 @@ const yapsInstance: Yaps = (function (): Yaps {
 
   yaps.unsubscribe = (token: string): Yaps => {
     for (const topic in topics) {
-      if (topics.hasOwnProperty(topic)) {
+      if (topics[topic]) {
         topics[topic].forEach((subscriber, index) => {
           if (subscriber.token === token) {
             topics[topic].splice(index, 1)
@@ -46,7 +51,7 @@ const yapsInstance: Yaps = (function (): Yaps {
     return yaps
   }
 
-  yaps.publish = (topic: string, ...rest: any[]): Yaps => {
+  yaps.publish = (topic: string, ...rest: PMSConnector[]): Yaps => {
     if (!topics[topic]) {
       return yaps
     }
@@ -63,6 +68,6 @@ const yapsInstance: Yaps = (function (): Yaps {
   return yaps
 })()
 
-export const yaps: Yaps = yapsInstance
+export const yapsInst: Yaps = yapsInstance
 
-export default yaps;
+export default yapsInst

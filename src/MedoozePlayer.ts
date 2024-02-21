@@ -9,11 +9,11 @@ interface PlayerConfig {
   id: string
   pms: {
     ws: WebSocket
-    tm: any // You should replace `any` with the actual type of `tm`
+    tm: TransactionManager
   }
   instanceID: string
   panelNumber?: number
-  onReconnect?: Function
+  onReconnect?: (instance: MedoozePlayer) => void
 }
 
 interface TransactionManagerError {
@@ -26,12 +26,12 @@ interface ViewResponse extends TransactionManagerError {
 
 export default class MedoozePlayer {
   id: string
-  onReconnect?: Function
+  onReconnect?: (instance: MedoozePlayer) => void
   instanceID: string
   panelNumber: number
   pcc: PeerConnectionClient
   ws: WebSocket
-  tm: TransactionManager // You should replace `any` with the actual type of `tm`
+  tm: TransactionManager
   viewerId: string | null
   client: MediaServerClient
   streamPromise: Promise<MediaStream | null>
@@ -56,8 +56,6 @@ export default class MedoozePlayer {
     this.tm = pms.tm
     this.viewerId = null
 
-    this.stop = this.stop.bind(this)
-
     // Create managed peer connection
     this.client = new MediaServerClient(this.tm)
 
@@ -73,7 +71,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      ;(async () => {
+      (async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
@@ -87,7 +85,6 @@ export default class MedoozePlayer {
             instance: this.instanceID,
             pcId: pcc.id
           })
-          console.log({ response: res })
 
           if (res.error) {
             return reject(res.error)
@@ -103,14 +100,14 @@ export default class MedoozePlayer {
 
   async createPeerConnection(
     cli: MediaServerClient,
-    resolve: Function,
+    resolve: (stream: MediaStream) => void,
     camId: string
   ) {
-    let pcc: PeerConnectionClient
-    pcc = await cli.createManagedPeerConnection()
+    const pcc: PeerConnectionClient = await cli.createManagedPeerConnection()
 
     // On new remote tracks
     pcc.ontrack = (event) => {
+      console.log('ontrack', event)
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
@@ -118,7 +115,45 @@ export default class MedoozePlayer {
       }
     }
 
+    pcc.ontrackended = (event) => {
+      console.log('ontrackended', event)
+      if (event.remoteTrackId === camId) {
+        this.stream = null
+      }
+    }
+
     return pcc
+  }
+
+  haltStream(id: string) {
+    if (id && this.stream) {
+      this.tm.cmd('unview', { id, instance: this.instanceID })
+    }
+  }
+
+  pause() {
+    this.haltStream(this.id)
+  }
+
+  async unPause() {
+    if (this.pcc && this.id && this.stream === null) {
+      try {
+        const res: ViewResponse = await this.tm.cmd('view', {
+          id: this.id,
+          instance: this.instanceID,
+          pcId: this.pcc.id
+        })
+
+        if (res.error) {
+          return res.error
+        }
+
+        this.viewerId = res.viewerId
+        return res
+      } catch (err) {
+        return err
+      }
+    }
   }
 
   stop() {
@@ -128,10 +163,7 @@ export default class MedoozePlayer {
     this.onReconnect && this.ws.removeEventListener('close', this.reconnect)
 
     // Only if WS is open. TM gives error
-    if (id) {
-      console.log('unviewing', id)
-      this.tm.cmd('unview', { id, instance: this.instanceID })
-    }
+    this.haltStream(id)
 
     // Clean up event listener and namespace + tm
     this.client.ns !== null && this.client.stop()

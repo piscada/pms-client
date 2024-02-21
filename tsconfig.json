@@ -1,35 +1,19 @@
 {
   // Change this to match your project
-  "include": [
-    "lib/*.js",
-    "utils/**/*",
-    "index.js",
-    "clientBuild.js",
-    "lib/MedoozePlayer.ts",
-    "lib/MedoozeConnector.ts",
-    "lib/api.ts",
-    "lib/MediaServerClient.ts",
-    "lib/yaps.ts",
-    "lib/helpers.ts"
-  ],
+  "include": ["src/**/*"],
   "compilerOptions": {
+    "target": "es2016",
+    "module": "ES2015",
+    "outDir": "dist",
     "moduleResolution": "node",
+    "declarationDir": "dist/types",
     "allowSyntheticDefaultImports": true,
-    // Tells TypeScript to read JS files, as
-    // normally they are ignored as source files
-    "allowJs": true,
-    // Generate d.ts files
+    "useUnknownInCatchVariables": false,
     "declaration": true,
-    // This compiler run should
-    // only output d.ts files
-    "emitDeclarationOnly": true,
-    // Types should go into this directory.
-    // Removing this would place the .d.ts files
-    // next to the .js files
-    "outDir": "types",
-    // go to js file when using IDE functions like
-    // "Go to Definition" in VSCode
-    "declarationMap": true,
-    "target": "es2015"
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "allowJs": true
   }
 }

@@ -37,11 +37,11 @@ export function getVersionPart(
 
 export function extractMajorMinorVersion(versionString: string): string {
   // Split the version string by dot delimiter
-  let parts = versionString.split('.')
+  const parts = versionString.split('.')
 
   // Extract the major and minor versions
-  let majorVersion = parts[0]
-  let minorVersion = parts[1]
+  const majorVersion = parts[0]
+  const minorVersion = parts[1]
 
   // Return an object containing the major and minor versions
   return 'v' + majorVersion + '.' + minorVersion

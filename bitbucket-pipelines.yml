@@ -30,7 +30,7 @@ pipelines:
             - git checkout master
 
             # Add the updated package.json, package-lock.json and clientInfo.js
-            - git add package.json package-lock.json clientInfo.js
+            - git add package.json package-lock.json ./src/clientInfo.js
             - git commit -m "Bump version to $PACKAGE_VERSION"
             - git push origin master
 
