@@ -49,3 +49,8 @@ Thumbs.db
 *.wmv
 
 .npmrc
+
+
+node_modules/
+dist/
+coverage/
