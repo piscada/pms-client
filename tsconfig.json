@@ -11,7 +11,7 @@
     // normally they are ignored as source files
     "allowJs": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
+    // "emitDeclarationOnly": true,
     "declarationMap": true,
     "target": "es2015",
     "forceConsistentCasingInFileNames": true,
