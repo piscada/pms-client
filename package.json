@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "clean": "rimraf dist/",
-    "deploy": "npm version patch && generate_client_info.sh && git add . && git commit -m 'test-build' && git push && git push --tags && npm ci && npm run build && npm publish",
+    "deploy": "npm version patch && generate_client_info.sh && git add . && git commit -m 'test-build' && git push && git push --tags && npm publish",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json"
   },
