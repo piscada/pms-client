@@ -1,7 +1,7 @@
-import MediaServerClient from "./lib/MediaServerClient.js";
-import PeerConnectionClient from "./lib/PeerConnectionClient.js";
-import MedoozeConnector from "./lib/MedoozeConnector.js";
-import MedoozePlayer from "./lib/MedoozePlayer.js";
-import clientInfo from "./clientInfo.js";
+import MediaServerClient from "./lib/MediaServerClient";
+import PeerConnectionClient from "./lib/PeerConnectionClient";
+import MedoozeConnector from "./lib/MedoozeConnector";
+import MedoozePlayer from "./lib/MedoozePlayer";
+import clientInfo from "./clientInfo";
 export { MediaServerClient, PeerConnectionClient, MedoozeConnector, MedoozePlayer, clientInfo };
 //# sourceMappingURL=index.d.ts.map

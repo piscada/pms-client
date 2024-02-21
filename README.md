@@ -24,6 +24,9 @@ If the PMS-server has done upgrades, the **equivalent version** should also be u
 ### Warnings
 The pms-client will show warnings in the console if there are old/miss-aligned versions between the PMS and pms-client.
 
+### Deploy from dev
+    npm run deploy
+
 ## Use package
 
 To use

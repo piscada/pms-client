@@ -1,7 +1,7 @@
-import MediaServerClient from '../lib/MediaServerClient.js'
-import PeerConnectionClient from '../lib/PeerConnectionClient.js'
-import MedoozeConnector from '../lib/MedoozeConnector.js'
-import MedoozePlayer from '../lib/MedoozePlayer.js'
+import MediaServerClient from '../lib/MediaServerClient.ts'
+import PeerConnectionClient from '../lib/PeerConnectionClient.ts'
+import MedoozeConnector from '../lib/MedoozeConnector.ts'
+import MedoozePlayer from '../lib/MedoozePlayer.ts'
 import clientInfo from '../clientInfo.js'
 
 describe('Test Module Import', () => {
