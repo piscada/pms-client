@@ -10,4 +10,4 @@ BUILD_DATE=$(date +'%d-%m-%Y_%H:%M:%S')
 JS="export default {buildDate: \"${BUILD_DATE}\", version: \"${CLIENT_VERSION}\"}"
 
 # Write JSON to file
-echo "$JS" > clientInfo.js
+echo "$JS" > ./src/clientInfo.js
