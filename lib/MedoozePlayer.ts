@@ -92,8 +92,9 @@ export default class MedoozePlayer {
           if (res.error) {
             return reject(res.error)
           }
-
+          
           this.viewerId = res.viewerId
+
         } catch (err) {
           return reject(err)
         }

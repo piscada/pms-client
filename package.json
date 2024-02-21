@@ -5,8 +5,11 @@
   "main": "index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "jest",
-    "deploy": "npm version patch --no-git-tag-version && generate_client_info.sh && git add . && git commit -m 'test-build' && git push && npm publish"
+    "test": "jest --config jestconfig.json",
+    "clean": "rimraf dist/",
+    "deploy": "npm version patch && generate_client_info.sh && git add . && git commit -m 'test-build' && git push && git push --tags && npm ci && npm run build && npm publish",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
