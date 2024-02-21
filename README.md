@@ -8,7 +8,7 @@ exports:
 - PeerConnectionClient
 - clientInfo.js
 
-Also contains a small Pub/Sub (lib/yaps.js) to handle reconnection to PMS-server.
+Also contains a small Pub/Sub (src/yaps.js) to handle reconnection to PMS-server.
 
 ## Deployment and compatibility
 

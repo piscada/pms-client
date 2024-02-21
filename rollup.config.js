@@ -1,9 +1,9 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
 import postcss from 'rollup-plugin-postcss';
 import excludeDependenciesFromBundle from 'rollup-plugin-exclude-dependencies-from-bundle';
+import typescriptRollupPlugin from 'rollup-plugin-ts';
 
 const packageJson = require('./package.json');
 
@@ -30,7 +30,7 @@ export default [
       excludeDependenciesFromBundle(),
       resolve(),
       commonjs(),
-      typescript({ tsconfig: './tsconfig.json' }),
+      typescriptRollupPlugin({ tsconfig: './tsconfig.json' }),
       postcss({
         extract: true,
       }),

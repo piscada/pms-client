@@ -2,6 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+/* tslint:disable */
+
 
 import { SDPInfo, StreamInfo, TrackInfo } from 'semantic-sdp'
 
@@ -424,7 +426,9 @@ export default class PeerConnectionClient {
           // Force renegotiation as event will have trigger before the event
           force = true
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
 
     // HACK: SDP mungling && codec override
     if (!this.strictW3C) {
