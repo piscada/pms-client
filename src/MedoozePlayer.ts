@@ -31,7 +31,7 @@ export default class MedoozePlayer {
   panelNumber: number
   pcc: PeerConnectionClient
   ws: WebSocket
-  tm: TransactionManager // You should replace `any` with the actual type of `tm`
+  tm: TransactionManager
   viewerId: string | null
   client: MediaServerClient
   streamPromise: Promise<MediaStream | null>
