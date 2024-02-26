@@ -35,7 +35,7 @@ export class PMSConnector {
   compatible: boolean | null
   ws: WebSocket | null
   tm: TransactionManager | null
-  cameraList: Promise<any>
+  cameraList: Promise<PmsCameraItem[]> | PmsCameraItem[]
 
   constructor(settings: PMSConnectorSettings) {
     this.serverConnect(settings)
@@ -79,8 +79,8 @@ export class PMSConnector {
     }
   }
 
-  createWebSocket(): Promise<any> {
-    return new Promise((resolve) => {
+  createWebSocket(): Promise<PmsCameraItem[]> {
+    return new Promise((resolve, reject) => {
       try {
         this.ws = new WebSocket(this.url + '?token=' + this.token, 'rtsp')
         this.tm = new TransactionManager(this.ws)
@@ -103,8 +103,10 @@ export class PMSConnector {
           if (this.settings.retries > 0) {
             this.reconnectWebSocket(this.settings)
           } else {
-            resolve(
-              `Timeout for PMS: ${this.host} - To bypass SSL verification \n => ${this.api}`
+            reject(
+              new Error(
+                `Timeout for PMS: ${this.host} - To bypass SSL verification \n => ${this.api}`
+              )
             )
           }
         }
@@ -143,7 +145,7 @@ export class PMSConnector {
     }
   }
 
-  async fetchCamList(): Promise<any> {
+  async fetchCamList(): Promise<PmsCameraItem[]> {
     let camList: PmsCameraItem[] = []
     if (this.isCloudServer) {
       camList = await fetchAllCamerasWithInstances(this.api, this.token)
@@ -173,7 +175,7 @@ export class PMSConnector {
 }
 
 export default async function MedoozeConnector(settings: PMSConnectorSettings) {
-  const o = new PMSConnector(settings)
-  o.cameraList = await o.createWebSocket()
-  return o
+  const connector = new PMSConnector(settings)
+  connector.cameraList = await connector.createWebSocket()
+  return connector
 }
