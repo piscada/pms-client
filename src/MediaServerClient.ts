@@ -45,7 +45,7 @@ export default class MediaServerClient {
     const pc = new RTCPeerConnection()
 
     // Add sendonly transceivers for getting full codec capabilities
-    // const video = pc.addTransceiver('video', { direction: 'sendonly' })
+    pc.addTransceiver('video', { direction: 'sendonly' })
 
     // Hack for firefox to retrieve all the header extensions
     // try {
