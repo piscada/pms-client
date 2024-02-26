@@ -56,10 +56,6 @@ export default class MedoozePlayer {
     this.tm = pms.tm
     this.viewerId = null
 
-    // this.stop = this.stop.bind(this)
-    // this.pause = this.pause.bind(this)
-    // this.unPause = this.unPause.bind(this)
-
     // Create managed peer connection
     this.client = new MediaServerClient(this.tm)
 
@@ -139,13 +135,14 @@ export default class MedoozePlayer {
           instance: this.instanceID,
           pcId: this.pcc.id
         })
-        console.log({ response: res })
+        console.log({ res })
 
         if (res.error) {
           return res.error
         }
 
         this.viewerId = res.viewerId
+        return res
       } catch (err) {
         return err
       }
