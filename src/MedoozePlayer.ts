@@ -9,7 +9,7 @@ interface PlayerConfig {
   id: string
   pms: {
     ws: WebSocket
-    tm: any // You should replace `any` with the actual type of `tm`
+    tm: TransactionManager
   }
   instanceID: string
   panelNumber?: number
@@ -57,6 +57,8 @@ export default class MedoozePlayer {
     this.viewerId = null
 
     this.stop = this.stop.bind(this)
+    this.pause = this.pause.bind(this)
+    this.unPause = this.unPause.bind(this)
 
     // Create managed peer connection
     this.client = new MediaServerClient(this.tm)
@@ -106,8 +108,7 @@ export default class MedoozePlayer {
     resolve: (stream: MediaStream) => void,
     camId: string
   ) {
-    let pcc: PeerConnectionClient
-    pcc = await cli.createManagedPeerConnection()
+    const pcc: PeerConnectionClient = await cli.createManagedPeerConnection()
 
     // On new remote tracks
     pcc.ontrack = (event) => {
@@ -119,6 +120,36 @@ export default class MedoozePlayer {
     }
 
     return pcc
+  }
+
+  pause() {
+    const id = this.id
+
+    if (this.id) {
+      console.log('unviewing', id)
+      this.tm.cmd('unview', { id, instance: this.instanceID })
+    }
+  }
+
+  async unPause() {
+    if (this.pcc && this.id) {
+      try {
+        const res: ViewResponse = await this.tm.cmd('view', {
+          id: this.id,
+          instance: this.instanceID,
+          pcId: this.pcc.id
+        })
+        console.log({ response: res })
+
+        if (res.error) {
+          return res.error
+        }
+
+        this.viewerId = res.viewerId
+      } catch (err) {
+        return err
+      }
+    }
   }
 
   stop() {
