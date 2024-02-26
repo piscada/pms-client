@@ -56,9 +56,9 @@ export default class MedoozePlayer {
     this.tm = pms.tm
     this.viewerId = null
 
-    this.stop = this.stop.bind(this)
-    this.pause = this.pause.bind(this)
-    this.unPause = this.unPause.bind(this)
+    // this.stop = this.stop.bind(this)
+    // this.pause = this.pause.bind(this)
+    // this.unPause = this.unPause.bind(this)
 
     // Create managed peer connection
     this.client = new MediaServerClient(this.tm)
@@ -75,7 +75,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      ;(async () => {
+      (async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
