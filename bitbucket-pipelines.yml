@@ -34,4 +34,5 @@ pipelines:
             - git commit -m "Bump version to $PACKAGE_VERSION"
             - git push origin master
 
-            - npm publish
+            # Build and deploy
+            - npm run deploy
