@@ -1,27 +1,40 @@
-// Fetched from :: https://github.com/medooze/media-server-client-js
-
 import { SDPInfo } from 'semantic-sdp'
 import PeerConnectionClient from './PeerConnectionClient.js'
+import TransactionManager from 'transaction-manager'
+
+type Options = {
+  sdpSemantics?: string
+  strictW3C?: boolean
+  forceSDPMunging?: boolean
+}
 
 export default class MediaServerClient {
-  constructor(tm) {
+  tm: TransactionManager
+  ns: any // Type as per your namespace
+
+  constructor(tm: TransactionManager) {
     // Crete namespace for us
     this.tm = tm
     this.ns = tm.namespace('medooze::pc')
+    // console.log(this.ns)
 
     // Listen events
-    this.ns.on('event', (event) => {
+    this.ns.on('event', (event: any) => {
+      // console.log({ namespaceEvent: event })
+
       // Check event name
       switch (event.name) {
         case 'stopped':
-          // Stopp us
+          // Stop us
           this.stop()
           break
       }
     })
   }
 
-  async createManagedPeerConnection(options) {
+  async createManagedPeerConnection(
+    options?: Options
+  ): Promise<PeerConnectionClient> {
     // Check if running
     if (!this.ns)
       // Error
@@ -32,18 +45,26 @@ export default class MediaServerClient {
     // Add unified plan flag for chrome
     cloned.sdpSemantics = 'unified-plan'
     // Create new peer connection
-    const pc = new RTCPeerConnection(cloned)
+    const pc = new RTCPeerConnection()
 
     // Add sendonly transceivers for getting full codec capabilities
-    // const audio = pc.addTransceiver('audio', { direction: 'sendonly' })
-    const video = pc.addTransceiver('video', { direction: 'sendonly' })
+    pc.addTransceiver('video', { direction: 'sendonly' })
 
     // Hack for firefox to retrieve all the header extensions
-    try {
-      await video.sender.setParameters({
-        encodings: [{ rid: 'a' }, { rid: 'b', scaleResolutionDownBy: 2.0 }]
-      })
-    } catch (e) {}
+    // try {
+    //   const val = await video.sender.setParameters({
+    //     encodings: [{ rid: 'a' }, { rid: 'b', scaleResolutionDownBy: 2.0 }],
+    //     transactionId: '',
+    //     codecs: [],
+    //     headerExtensions: [],
+    //     rtcp: undefined
+    //   })
+
+    //   console.log(val)
+    // } catch (e) {
+    //   console.log('Error setting parameters with firefox')
+    //   console.log(e)
+    // }
 
     // Create offer
     const offer = await pc.createOffer()
@@ -58,14 +79,15 @@ export default class MediaServerClient {
     const remote = await this.ns.cmd('create', localInfo.plain())
 
     // Get peer connection id
+    // console.log({ remote })
     const id = remote.id
     // Create namespace for pc
-    const pcns = this.tm.namespace('medooze::pc::' + id)
+    const pcNs = this.tm.namespace('medooze::pc::' + id)
 
     // create new managed pc client
     return new PeerConnectionClient({
       id,
-      ns: pcns,
+      ns: pcNs,
       pc,
       remote,
       localInfo,
