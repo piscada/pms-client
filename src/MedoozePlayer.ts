@@ -121,7 +121,6 @@ export default class MedoozePlayer {
     const id = this.id
 
     if (this.id) {
-      console.log('unviewing', id)
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
   }
@@ -134,7 +133,6 @@ export default class MedoozePlayer {
           instance: this.instanceID,
           pcId: this.pcc.id
         })
-        console.log({ res })
 
         if (res.error) {
           return res.error
@@ -156,7 +154,6 @@ export default class MedoozePlayer {
 
     // Only if WS is open. TM gives error
     if (id) {
-      console.log('unviewing', id)
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
 
