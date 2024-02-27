@@ -71,7 +71,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      (async () => {
+      ;(async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
@@ -85,7 +85,6 @@ export default class MedoozePlayer {
             instance: this.instanceID,
             pcId: pcc.id
           })
-          console.log({ response: res })
 
           if (res.error) {
             return reject(res.error)
