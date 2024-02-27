@@ -107,6 +107,7 @@ export default class MedoozePlayer {
 
     // On new remote tracks
     pcc.ontrack = (event) => {
+      console.log('ontrack', event) 
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
@@ -114,18 +115,34 @@ export default class MedoozePlayer {
       }
     }
 
+    pcc.ontrackended = (event) => {
+      console.log('ontrackended', event)
+      if (event.remoteTrackId === camId) {
+        this.stream = null
+      }
+    }
+
     return pcc
   }
 
-  pause() {
-    const id = this.id
-
-    if (this.id) {
+  haltStream(id: string) {
+    console.log(this.pcc.streams)
+    console.log(this.stream);
+    if (id) {
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
   }
 
+  pause() {
+    console.log(this.pcc.streams)
+    console.log(this.stream);
+    console.log('pausing', this.id, this.stream)
+    this.haltStream(this.id)
+  }
+
   async unPause() {
+    console.log(this.pcc.streams)
+    console.log(this.stream);
     if (this.pcc && this.id) {
       try {
         const res: ViewResponse = await this.tm.cmd('view', {
@@ -153,9 +170,7 @@ export default class MedoozePlayer {
     this.onReconnect && this.ws.removeEventListener('close', this.reconnect)
 
     // Only if WS is open. TM gives error
-    if (id) {
-      this.tm.cmd('unview', { id, instance: this.instanceID })
-    }
+    this.haltStream(id)
 
     // Clean up event listener and namespace + tm
     this.client.ns !== null && this.client.stop()

@@ -41,7 +41,8 @@ export default class PeerConnectionClient {
     }
 
     // Dummy events
-    this.ontrack = (event) => console.log('ontrack', event)
+    // These can be optionally overridden
+    this.ontrack = (event) => console.log('ontrack', event) 
     this.ontrackended = (event) => console.log('ontrackended', event)
     this.onstatsended = (event) => console.log('onstatsended', event)
 
