@@ -39,7 +39,7 @@ export const fetchAllCamerasWithInstances = async (
 
       const camerasFromInstance = await response.json()
 
-      console.log({ camerasFromInstance })
+      // console.log({ camerasFromInstance })
 
       return camerasFromInstance
     })

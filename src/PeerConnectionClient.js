@@ -360,7 +360,7 @@ export default class PeerConnectionClient {
 
     // Hack for firefox
     if (simulcast03)
-      // Use old simulcast format used by firefos
+      // Use old simulcast format used by firefox
       sdp = sdp.replace(':recv ', ': recv rid=')
 
     // Set it
@@ -369,11 +369,11 @@ export default class PeerConnectionClient {
       sdp
     })
 
-    // Procces pending transceivers again
+    // Process pending transceivers again
     // Delete flag
     for (const transceiver of processing) delete transceiver.pending
 
-    // We are not renegotiting
+    // We are not renegotiating
     this.renegotiating = false
 
     // If there are new pending
@@ -388,10 +388,10 @@ export default class PeerConnectionClient {
 
   async addTrack(track, stream, params) {
     let transceiver
-    // Flag to force a renegotition
+    // Flag to force a renegotiation
     let force = this.forceRenegotiation
     // Get send encodings
-    const sendEncodings = (params && params.encodings) || []
+    const sendEncodings = (params?.encodings) || []
 
     try {
       // Create new transceiver
@@ -401,12 +401,12 @@ export default class PeerConnectionClient {
         sendEncodings: !this.forceSDPMunging ? sendEncodings : undefined
       })
     } catch (e) {
-      // HACK: old crhome
+      // HACK: old chrome
       if (this.strictW3C)
         // Retrow
         throw e
 
-      // New chrome launch exception when multiple send encofings are used, so create without them and fix them later
+      // New chrome launch exception when multiple send encodings are used, so create without them and fix them later
       transceiver = this.pc.addTransceiver(track, {
         direction: 'sendonly',
         streams: stream ? [stream] : []
@@ -421,7 +421,7 @@ export default class PeerConnectionClient {
       try {
         // If doing simulcast
         if (sendEncodings.length) {
-          // Set simuclast stuff for firefox
+          // Set simulcast stuff for firefox
           await transceiver.sender.setParameters({ encodings: sendEncodings })
           // Force renegotiation as event will have trigger before the event
           force = true
@@ -436,7 +436,7 @@ export default class PeerConnectionClient {
       const sendParameters = transceiver.sender.getParameters()
       // Check if we need to fix simulcast info
       if (sendParameters.encodings) {
-        // Ifwe could not set the encoding parameters yet
+        // If we could not set the encoding parameters yet
         if (sendParameters.encodings.length !== sendEncodings.length)
           // Fix them later
           transceiver.fixSimulcastEncodings = sendEncodings
@@ -445,7 +445,7 @@ export default class PeerConnectionClient {
       }
     }
     // If we have to override codec
-    if (params && params.codecs)
+    if (params?.codecs)
       // Set it on transceicer
       transceiver.codecs = params.codecs
 
@@ -635,7 +635,7 @@ function fixLocalSDP(sdp, transceivers) {
     } else {
       // Nothing
     }
-    // Remove not usedcodecs
+    // Remove not used codecs
     if (transceiver.codecs)
       // For all video codecs
       // If not allowed

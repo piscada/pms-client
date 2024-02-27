@@ -16,10 +16,12 @@ export default class MediaServerClient {
     // Crete namespace for us
     this.tm = tm
     this.ns = tm.namespace('medooze::pc')
-    console.log(this.ns);
+    // console.log(this.ns)
 
     // Listen events
     this.ns.on('event', (event: any) => {
+      // console.log({ namespaceEvent: event })
+
       // Check event name
       switch (event.name) {
         case 'stopped':
@@ -77,7 +79,7 @@ export default class MediaServerClient {
     const remote = await this.ns.cmd('create', localInfo.plain())
 
     // Get peer connection id
-    console.log({ remote });
+    // console.log({ remote })
     const id = remote.id
     // Create namespace for pc
     const pcNs = this.tm.namespace('medooze::pc::' + id)
