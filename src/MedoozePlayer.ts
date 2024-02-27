@@ -107,7 +107,7 @@ export default class MedoozePlayer {
 
     // On new remote tracks
     pcc.ontrack = (event) => {
-      console.log('ontrack', event) 
+      console.log('ontrack', event)
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
@@ -127,7 +127,7 @@ export default class MedoozePlayer {
 
   haltStream(id: string) {
     console.log(this.pcc.streams)
-    console.log(this.stream);
+    console.log(this.stream)
     if (id) {
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
@@ -135,14 +135,14 @@ export default class MedoozePlayer {
 
   pause() {
     console.log(this.pcc.streams)
-    console.log(this.stream);
+    console.log(this.stream)
     console.log('pausing', this.id, this.stream)
     this.haltStream(this.id)
   }
 
   async unPause() {
     console.log(this.pcc.streams)
-    console.log(this.stream);
+    console.log(this.stream)
     if (this.pcc && this.id) {
       try {
         const res: ViewResponse = await this.tm.cmd('view', {
