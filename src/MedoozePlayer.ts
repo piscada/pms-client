@@ -37,7 +37,6 @@ export default class MedoozePlayer {
   streamPromise: Promise<MediaStream | null>
   stream: MediaStream | null
   reconnect: () => void
-  active: boolean
 
   constructor(config: PlayerConfig) {
     // Constructor
@@ -56,7 +55,6 @@ export default class MedoozePlayer {
     this.ws = pms.ws
     this.tm = pms.tm
     this.viewerId = null
-    this.active = false
 
     // Create managed peer connection
     this.client = new MediaServerClient(this.tm)
@@ -113,7 +111,6 @@ export default class MedoozePlayer {
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
-        this.active = true
         resolve(this.stream)
       }
     }
@@ -122,7 +119,6 @@ export default class MedoozePlayer {
       console.log('ontrackended', event)
       if (event.remoteTrackId === camId) {
         // this.stream = null
-        this.active = false
       }
     }
 
@@ -130,7 +126,7 @@ export default class MedoozePlayer {
   }
 
   haltStream(id: string) {
-    if (id && this.active) {
+    if (id) {
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
   }
@@ -140,7 +136,6 @@ export default class MedoozePlayer {
   }
 
   async unPause() {
-    console.log('unPause', this.id, this.pcc, this.active)
     if (this.pcc && this.id) {
       try {
         const res: ViewResponse = await this.tm.cmd('view', {
