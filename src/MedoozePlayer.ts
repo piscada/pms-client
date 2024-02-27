@@ -73,7 +73,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      ;(async () => {
+      (async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
@@ -140,7 +140,8 @@ export default class MedoozePlayer {
   }
 
   async unPause() {
-    if (this.pcc && this.id && !this.active) {
+    console.log('unPause', this.id, this.pcc, this.active)
+    if (this.pcc && this.id) {
       try {
         const res: ViewResponse = await this.tm.cmd('view', {
           id: this.id,
