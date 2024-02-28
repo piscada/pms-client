@@ -82,7 +82,6 @@ export default class MediaServerClient {
     const remote = await this.ns.cmd('create', localInfo.plain())
 
     // Get peer connection id
-    // console.log({ remote })
     const id = remote.id
     // Create namespace for pc
     const pcNs = this.tm.namespace('medooze::pc::' + id)

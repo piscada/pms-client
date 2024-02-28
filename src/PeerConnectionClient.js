@@ -79,8 +79,6 @@ export default class PeerConnectionClient {
       const data = event.data
       // Check event name
 
-      console.log({ name: event.name, data })
-
       switch (event.name) {
         case 'addedtrack': {
           // Add it for later addition
