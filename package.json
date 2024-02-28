@@ -1,6 +1,6 @@
 {
   "name": "@piscada/pms-client",
-  "version": "2.6.77",
+  "version": "2.6.78",
   "description": "PMS client library files",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -12,9 +12,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "clean": "rimraf dist/",
-    "get-version": "node -pe \"require('./package.json').version\"",
-    "commit-version": "git commit -m \"Version $(npm run get-version)\"",
-    "deploy": "npm version patch --no-git-tag-version && generate_client_info.sh && npm run build && git add . && npm run commit-version && git push && git push --tags && npm publish",
+    "deploy": "npm version patch --no-git-tag-version && generate_client_info.sh && npm run build && push_version.sh && npm publish",
     "build": "npm run clean && npm run test && npm run format && npm run lint && rollup -c",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint src/**/*.ts --fix"
