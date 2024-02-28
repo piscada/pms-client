@@ -1,6 +1,11 @@
 import { SDPInfo } from 'semantic-sdp'
 import PeerConnectionClient from './PeerConnectionClient.js'
-import TransactionManager from 'transaction-manager'
+import {
+  TransactionManager,
+  Namespace,
+  AllowedMessages,
+  Event
+} from './transaction-manager'
 
 type Options = {
   sdpSemantics?: string
@@ -8,18 +13,21 @@ type Options = {
   forceSDPMunging?: boolean
 }
 
+interface createResponse {
+  id: string
+  sdp: string
+}
+
 export default class MediaServerClient {
   tm: TransactionManager
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ns: any
+  ns: Namespace<string, AllowedMessages>
   constructor(tm: TransactionManager) {
     // Crete namespace for us
     this.tm = tm
     this.ns = tm.namespace('medooze::pc')
 
     // Listen events
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.ns.on('event', (event: any) => {
+    this.ns.on('event', (event: Event) => {
       console.log(
         'Namespace Event. This is interesting. Should use this for remote shutdown.'
       )
@@ -79,7 +87,10 @@ export default class MediaServerClient {
     await pc.setLocalDescription(offer)
 
     // Connect
-    const remote = await this.ns.cmd('create', localInfo.plain())
+    const remote: createResponse = await this.ns.cmd(
+      'create',
+      localInfo.plain()
+    )
 
     // Get peer connection id
     const id = remote.id

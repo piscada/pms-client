@@ -1,5 +1,5 @@
 import { snack, debug, success, error as errorMsg } from '@piscada/snackbar'
-import TransactionManager from 'transaction-manager'
+import { TransactionManager } from './transaction-manager'
 import { PmsCameraItem, fetchAllCamerasWithInstances } from './api'
 import yaps from './yaps'
 import clientInfo from './clientInfo'

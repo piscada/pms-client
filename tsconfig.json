@@ -3,7 +3,7 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "target": "es2016",
-    "module": "ES2015",
+    "module": "NodeNext",
     "outDir": "dist",
     "moduleResolution": "node",
     "declarationDir": "dist/types",

@@ -1,7 +1,7 @@
 import { info, success } from '@piscada/snackbar'
 import MediaServerClient from './MediaServerClient'
 import yaps from './yaps'
-import TransactionManager from 'transaction-manager'
+import { TransactionManager } from './transaction-manager'
 import PeerConnectionClient from './PeerConnectionClient'
 import { PMSConnector } from './MedoozeConnector'
 
