@@ -150,7 +150,6 @@ export class PMSConnector {
         ***
         `
       )
-      console.error(err)
       return false
     }
   }
