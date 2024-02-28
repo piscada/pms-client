@@ -41,6 +41,10 @@ Bitbucket pipelines are slow and sluggish. Deploy from localhost instead:
 
     npm run deploy
 
+To just test build
+
+    npm run build
+
 ## Future improvements
 
 - ~~PMS compatibilty check~~
