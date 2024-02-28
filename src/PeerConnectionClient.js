@@ -202,6 +202,9 @@ export default class PeerConnectionClient {
             // Delete it
             delete this.streams[transceiver.streamId]
           try {
+
+            console.log("is this ever called?")
+            console.log(streamInfo.getId())
             // Launch event
             this.ontrackended(
               new (RTCTrackEvent || Event)('trackended', {
