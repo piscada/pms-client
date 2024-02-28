@@ -10,16 +10,19 @@ type Options = {
 
 export default class MediaServerClient {
   tm: TransactionManager
-  ns: any // Type as per your namespace
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ns: any
   constructor(tm: TransactionManager) {
     // Crete namespace for us
     this.tm = tm
     this.ns = tm.namespace('medooze::pc')
 
     // Listen events
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.ns.on('event', (event: any) => {
-      console.log('Namespace Event. This is interessting. Should use this for remote shutdown.')
+      console.log(
+        'Namespace Event. This is interesting. Should use this for remote shutdown.'
+      )
       console.log({ event })
 
       // Check event name
