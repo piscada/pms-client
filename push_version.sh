@@ -3,10 +3,9 @@
 git add .
 
 # Get the package version from package.json
-version=$(node -pe "require('./package.json').version")
+version=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' package.json)
 
 echo "Version: $version"
-echo "Version: $npm_package_version"
 
 # Commit with the version
 git commit -m "Version $version"
