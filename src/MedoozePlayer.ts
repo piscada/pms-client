@@ -37,6 +37,7 @@ export default class MedoozePlayer {
   streamPromise: Promise<MediaStream | null>
   stream: MediaStream | null
   reconnect: () => void
+  active: boolean
 
   constructor(config: PlayerConfig) {
     // Constructor
@@ -50,6 +51,9 @@ export default class MedoozePlayer {
     this.onReconnect = onReconnect
     this.instanceID = instanceID
     this.panelNumber = panelNumber
+
+    this.active = false // Initialize the active property
+    this.stream = null
 
     this.pcc = null
     this.ws = pms.ws
@@ -106,21 +110,23 @@ export default class MedoozePlayer {
     const pcc: PeerConnectionClient = await cli.createManagedPeerConnection()
 
     // On new remote tracks
-    pcc.ontrack = (event) => {
+    pcc.ontrack = ((event) => {
       console.log('ontrack', event)
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
+        this.active = true
         resolve(this.stream)
       }
-    }
+    }).bind(this) // <-- Bind this here
 
-    pcc.ontrackended = (event) => {
+    pcc.ontrackended = ((event) => {
       console.log('ontrackended', event)
       if (event.remoteTrackId === camId) {
-        // this.stream = null
+        this.stream = null
+        this.active = false
       }
-    }
+    }).bind(this) // <-- Bind this here
 
     return pcc
   }
