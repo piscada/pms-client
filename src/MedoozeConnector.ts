@@ -1,4 +1,4 @@
-import { snack, debug, success, error } from '@piscada/snackbar'
+import { snack, debug, success, error as errorMsg } from '@piscada/snackbar'
 import TransactionManager from 'transaction-manager'
 import { PmsCameraItem, fetchAllCamerasWithInstances } from './api'
 import yaps from './yaps'
@@ -130,17 +130,17 @@ export class PMSConnector {
       if (
         compareMinorVersions(pmsBuild.version, clientBuild.version) === false
       ) {
-        error(
+        errorMsg(
           `PMS version ${pmsBuild.version} is not compatible with PMS-client version ${clientBuild.version}. Please the PMS to ${this.requiredVersion} or higher.`
         )
         return false
       }
       return true
-    } catch (error) {
-      error(
+    } catch (err) {
+      errorMsg(
         `Could not read PMS-version from /config/version endpoint. Upgrade PMS server to ${this.requiredVersion} or higher`
       )
-      console.error(error)
+      console.error(err)
       return false
     }
   }
