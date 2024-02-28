@@ -1,44 +1,49 @@
 # pms-client
 
 Library files for creating WebRTC connection to PMS-server:
-exports:
+
 - MediaServerClient
 - MedoozeConnector
 - MedoozePlayer
 - PeerConnectionClient
-- clientInfo.js
 
-Also contains a small Pub/Sub (src/yaps.js) to handle reconnection to PMS-server.
+Also contains a small Pub/Sub lib (src/yaps.js) to handle reconnection to PMS-server.
 
-## Deployment and compatibility
+## Version compatibility
 
-To upgrade the package set semantic versioning by `git tag`, `v2.6.3`
+The PMS-server and the pms-client should always follow the **equivalent minor version**.
 
-If the PMS-server has done upgrades, the **equivalent version** should also be upped in the pms-client, so **they are the same**
+E.g 2.X.123 <=> 2.X.414.
 
-| PMS version | @piscada/pms-client            |
-| ----------- | --------------------- |
-| <2.4.9    | Legacy   (broken)     |
-| >=2.6.0    | >=2.6.0               |
+X should be the same minor version.
 
-### Warnings
-The pms-client will show warnings in the console if there are old/miss-aligned versions between the PMS and pms-client.
+| PMS version | @piscada/pms-client        |
+| ----------- | -------------------------- |
+| <2.4.9      | Deprecated with pms-client |
+| 2.6.0       | 2.6.1                      |
+| 2.7.0       | 2.7.1                      |
 
-### Deploy from dev
-    npm run deploy
+The pms-client will show warnings in the console if there are the PMS is deprecated/miss-aligned with its version.
 
 ## Use package
 
 To use
 
-    npm i @piscada/pms-client
-    
-    yarn add piscada@pms-client
+```bash
+npm i @piscada/pms-client
+# or
+yarn add piscada@pms-client
+```
+
+### Update package and deploy
+
+Bitbucket pipelines are slow and sluggish. Deploy from localhost instead:
+
+    npm run deploy
 
 ## Future improvements
 
-
-- ~~PMS compatibilty check~~ 
+- ~~PMS compatibilty check~~
 - Add examples (for now check integration in WebPMP v3 and PMSWE)
 - Rewrite to typescript
 - Tests

@@ -61,12 +61,24 @@ export default class PeerConnectionClient {
         console.error(e)
       }
     }
-    this.pc.onstatsended = (event) => {
-      // NOTE: Added the same forwarding trick as in ontrack event above.
 
+    // Forward events
+     // NOTE: Added the same forwarding trick as in ontrack event above.
+    this.pc.ontrackended = (event) => {
+
+      // Set remote ids
       event.remoteStreamId = event.transceiver.streamId
       event.remoteTrackId = event.transceiver.trackId
 
+      try {
+        // Re-fire
+        this.ontrackended(event)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    this.pc.onstatsended = (event) => {
       try {
         // Relaunch event
         this.onstatsended(event)
