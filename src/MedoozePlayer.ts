@@ -75,7 +75,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      (async () => {
+      ;(async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
@@ -110,7 +110,7 @@ export default class MedoozePlayer {
     const pcc: PeerConnectionClient = await cli.createManagedPeerConnection()
 
     // On new remote tracks
-    pcc.ontrack = ((event) => {
+    pcc.ontrack = (event) => {
       console.log('ontrack', event)
       if (event.remoteTrackId === camId) {
         const track = event.track
@@ -118,15 +118,16 @@ export default class MedoozePlayer {
         this.active = true
         resolve(this.stream)
       }
-    }).bind(this) // <-- Bind this here
+    }
 
-    pcc.ontrackended = ((event) => {
+    pcc.ontrackended = (event) => {
       console.log('ontrackended', event)
       if (event.remoteTrackId === camId) {
+        console.log('nulling out cause we got remoteTrackId. Good job lad!')
         this.stream = null
         this.active = false
       }
-    }).bind(this) // <-- Bind this here
+    }
 
     return pcc
   }

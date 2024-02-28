@@ -4,7 +4,6 @@
 /* eslint-disable no-undef */
 /* tslint:disable */
 
-
 import { SDPInfo, StreamInfo, TrackInfo } from 'semantic-sdp'
 
 export default class PeerConnectionClient {
@@ -42,7 +41,7 @@ export default class PeerConnectionClient {
 
     // Dummy events
     // These can be optionally overridden
-    this.ontrack = (event) => console.log('ontrack', event) 
+    this.ontrack = (event) => console.log('ontrack', event)
     this.ontrackended = (event) => console.log('ontrackended', event)
     this.onstatsended = (event) => console.log('onstatsended', event) // Deprecated ? Not used any more?
 
@@ -50,9 +49,11 @@ export default class PeerConnectionClient {
     this.pc.ontrack = (event) => {
       // Store streams from event
       event.transceiver.trackInfo.streams = event.streams
+
       // Set remote ids
       event.remoteStreamId = event.transceiver.streamId
       event.remoteTrackId = event.transceiver.trackId
+
       try {
         // Re-fire
         this.ontrack(event)
@@ -61,6 +62,11 @@ export default class PeerConnectionClient {
       }
     }
     this.pc.onstatsended = (event) => {
+      // NOTE: Added the same forwarding trick as in ontrack event above.
+
+      event.remoteStreamId = event.transceiver.streamId
+      event.remoteTrackId = event.transceiver.trackId
+
       try {
         // Relaunch event
         this.onstatsended(event)
@@ -392,7 +398,7 @@ export default class PeerConnectionClient {
     // Flag to force a renegotiation
     let force = this.forceRenegotiation
     // Get send encodings
-    const sendEncodings = (params?.encodings) || []
+    const sendEncodings = params?.encodings || []
 
     try {
       // Create new transceiver
@@ -428,7 +434,7 @@ export default class PeerConnectionClient {
           force = true
         }
       } catch (e) {
-        console.error(e);
+        console.error(e)
       }
 
     // HACK: SDP mungling && codec override
@@ -655,7 +661,7 @@ function fixLocalSDP(sdp, transceivers) {
 
 // From : https://gist.github.com/tnoho/948be984f9981b59df43
 function removeCodec(orgsdp, codec) {
-  const internalFunc = function(sdp) {
+  const internalFunc = function (sdp) {
     const codecre = new RegExp(
       '(a=rtpmap:(\\d*) ' + codec + '/90000\\r\\n)',
       'i'
