@@ -131,14 +131,14 @@ export class PMSConnector {
         compareMinorVersions(pmsBuild.version, clientBuild.version) === false
       ) {
         errorMsg(
-          `PMS version ${pmsBuild.version} is not compatible with PMS-client version ${clientBuild.version}. Please the PMS to ${this.requiredVersion} or higher.`
+          `PMS version ${pmsBuild.version} is not compatible with PMS-client version ${clientBuild.version}. Please upgrade PMS ${this.host} to ${this.requiredVersion} or higher.`
         )
         return false
       }
       return true
     } catch (err) {
       errorMsg(
-        `Could not read PMS-version from /config/version endpoint. Upgrade PMS server to ${this.requiredVersion} or higher`
+        `Could not read PMS-version from /config/version endpoint. Upgrade PMS server ${this.host} to ${this.requiredVersion} or higher`
       )
       console.error(err)
       return false
