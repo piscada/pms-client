@@ -1,6 +1,6 @@
 {
   "name": "@piscada/pms-client",
-  "version": "2.6.59",
+  "version": "2.6.60",
   "description": "PMS client library files",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
