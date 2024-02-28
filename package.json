@@ -12,7 +12,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "clean": "rimraf dist/",
-    "commit-version": "git commit -m \"Version $(npm run env | grep npm_package_version | sed 's/npm_package_version=//')\"",
+    "commit-version": "git commit -m \"Version $(node -pe \"require('./package.json').version\")\"",
     "deploy": "npm version patch --no-git-tag-version && generate_client_info.sh && npm run build && git add . && npm run commit-version && git push && git push --tags && npm publish",
     "build": "npm run clean && npm run test && npm run format && npm run lint && rollup -c",
     "format": "prettier --write \"src/**/*.ts\"",
