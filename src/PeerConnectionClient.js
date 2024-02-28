@@ -64,24 +64,6 @@ export default class PeerConnectionClient {
       }
     }
 
-    // Forward events
-     // NOTE: Added the same forwarding trick as in ontrack event above.
-    this.pc.ontrackended = (event) => {
-
-      console.log("ontrackended event fired with modified event object.")
-
-      // Set remote ids
-      event.remoteStreamId = event.transceiver.streamId
-      event.remoteTrackId = event.transceiver.trackId
-
-      try {
-        // Re-fire
-        this.ontrackended(event)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
     this.pc.onstatsended = (event) => {
       try {
         // Relaunch event
@@ -97,6 +79,9 @@ export default class PeerConnectionClient {
       // Get event data
       const data = event.data
       // Check event name
+
+      console.log({ name: event.name, data })
+
       switch (event.name) {
         case 'addedtrack': {
           // Add it for later addition
@@ -126,12 +111,12 @@ export default class PeerConnectionClient {
   async renegotiate() {
     // Detect simulcast-03 used by firefox
     let simulcast03 = false
-    // On chrome negotiation needed is fired multtiple times one per transceiver
+    // On chrome negotiation needed is fired multiple times one per transceiver
     if (this.renegotiating)
       // Nothing to do
       return
 
-    // We are renegotiting, we need the flag as the function is async
+    // We are renegotiating, we need the flag as the function is async
     this.renegotiating = true
 
     // Process addingionts first
@@ -141,7 +126,7 @@ export default class PeerConnectionClient {
       const trackInfo = TrackInfo.expand(data.track)
       // Check if we can reuse a transceiver
       for (const reused of this.pc.getTransceivers()) {
-        // If inactive and  not pending or stopped
+        // If inactive and not pending or stopped
         if (
           reused.receiver.track.kind === trackInfo.getMedia() &&
           reused.direction === 'inactive' &&
@@ -216,8 +201,8 @@ export default class PeerConnectionClient {
                 track: transceiver.receiver.track,
                 streams: trackInfo.streams,
                 transceiver,
-                remoteStreamId: streamInfo.getId(),
-                remoteTrackId: trackInfo.getId()
+                remoteStreamId: streamInfo.getId(), // these two maggots wont stick to the trackended instance properties
+                remoteTrackId: trackInfo.getId() // these two maggots wont stick to the trackended instance properties
               })
             )
           } catch (e) {

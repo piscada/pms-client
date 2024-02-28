@@ -38,6 +38,7 @@ export default class MedoozePlayer {
   stream: MediaStream | null
   reconnect: () => void
   active: boolean
+  trackId: string
 
   constructor(config: PlayerConfig) {
     // Constructor
@@ -116,16 +117,18 @@ export default class MedoozePlayer {
         const track = event.track
         this.stream = new MediaStream([track])
         this.active = true
+        this.trackId = event.track.id
         resolve(this.stream)
       }
     }
 
     pcc.ontrackended = (event) => {
       console.log('ontrackended', event)
-      if (event.remoteTrackId === camId) {
+      if (event.track.id === this.trackId) {
         console.log('nulling out cause we got remoteTrackId. Good job lad!')
         this.stream = null
         this.active = false
+        this.trackId = null
       }
     }
 
@@ -133,7 +136,8 @@ export default class MedoozePlayer {
   }
 
   haltStream(id: string) {
-    if (id) {
+    console.log(this.active, id, this.trackId, this.stream);
+    if (id && this.active) {
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
   }
