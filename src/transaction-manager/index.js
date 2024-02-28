@@ -1,5 +1,4 @@
-'use strict'
-const { TypedEmitter: EventEmitter } = require('tiny-typed-emitter')
+import { TypedEmitter as EventEmitter } from 'tiny-typed-emitter'
 
 // WIRE PROTOCOL
 
@@ -425,4 +424,4 @@ class TransactionManager extends EventEmitter {
   }
 }
 
-module.exports = { TransactionManager, Namespace }
+export { TransactionManager, Namespace }

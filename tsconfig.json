@@ -3,9 +3,9 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "target": "es2016",
-    "module": "NodeNext",
+    "module": "ES2015",
     "outDir": "dist",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "declarationDir": "dist/types",
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false,
