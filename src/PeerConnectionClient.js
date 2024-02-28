@@ -47,6 +47,8 @@ export default class PeerConnectionClient {
 
     // Forward events
     this.pc.ontrack = (event) => {
+
+      console.log("ontrack event fired with modified event object.")
       // Store streams from event
       event.transceiver.trackInfo.streams = event.streams
 
@@ -65,6 +67,8 @@ export default class PeerConnectionClient {
     // Forward events
      // NOTE: Added the same forwarding trick as in ontrack event above.
     this.pc.ontrackended = (event) => {
+
+      console.log("ontrackended event fired with modified event object.")
 
       // Set remote ids
       event.remoteStreamId = event.transceiver.streamId
