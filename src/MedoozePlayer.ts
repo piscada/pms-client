@@ -53,7 +53,6 @@ export default class MedoozePlayer {
     this.instanceID = instanceID
     this.panelNumber = panelNumber
 
-    this.active = false // Initialize the active property
     this.stream = null
 
     this.pcc = null
@@ -76,7 +75,7 @@ export default class MedoozePlayer {
     // Need to resolve this.streamPromise to get srcObject
 
     this.streamPromise = new Promise((resolve, reject) => {
-      ;(async () => {
+      (async () => {
         try {
           const pcc = await this.createPeerConnection(
             this.client,
@@ -112,22 +111,18 @@ export default class MedoozePlayer {
 
     // On new remote tracks
     pcc.ontrack = (event) => {
-      console.log('ontrack', event)
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
-        this.active = true
-        this.trackId = event.track.id
+        this.trackId = track.id
         resolve(this.stream)
       }
     }
 
+    // On remote track ended
     pcc.ontrackended = (event) => {
-      console.log('ontrackended', event)
       if (event.track.id === this.trackId) {
-        console.log('nulling out cause we got remoteTrackId. Good job lad!')
         this.stream = null
-        this.active = false
         this.trackId = null
       }
     }
@@ -136,8 +131,7 @@ export default class MedoozePlayer {
   }
 
   haltStream(id: string) {
-    console.log(this.active, id, this.trackId, this.stream);
-    if (id && this.active) {
+    if (id && this.stream) {
       this.tm.cmd('unview', { id, instance: this.instanceID })
     }
   }

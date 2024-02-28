@@ -16,11 +16,11 @@ export default class MediaServerClient {
     // Crete namespace for us
     this.tm = tm
     this.ns = tm.namespace('medooze::pc')
-    // console.log(this.ns)
 
     // Listen events
     this.ns.on('event', (event: any) => {
-      // console.log({ namespaceEvent: event })
+      console.log('Namespace Event. This is interessting. Should use this for remote shutdown.')
+      console.log({ event })
 
       // Check event name
       switch (event.name) {

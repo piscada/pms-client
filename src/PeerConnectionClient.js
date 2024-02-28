@@ -48,7 +48,6 @@ export default class PeerConnectionClient {
     // Forward events
     this.pc.ontrack = (event) => {
 
-      console.log("ontrack event fired with modified event object.")
       // Store streams from event
       event.transceiver.trackInfo.streams = event.streams
 
@@ -192,8 +191,6 @@ export default class PeerConnectionClient {
             delete this.streams[transceiver.streamId]
           try {
 
-            console.log("is this ever called?")
-            console.log(streamInfo.getId())
             // Launch event
             this.ontrackended(
               new (RTCTrackEvent || Event)('trackended', {
