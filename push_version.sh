@@ -6,6 +6,7 @@ git add .
 version=$(node -pe "require('./package.json').version")
 
 echo "Version: $version"
+echo "Version: $npm_package_version"
 
 # Commit with the version
 git commit -m "Version $version"
