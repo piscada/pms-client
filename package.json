@@ -12,7 +12,7 @@
   "scripts": {
     "test": "jest --config jestconfig.json",
     "clean": "rimraf dist/",
-    "deploy": "npm version patch && generate_client_info.sh && git add . && git commit -m 'patch bumped up' && git push --tags && npm run build && npm publish",
+    "deploy": "npm version patch && generate_client_info.sh && git add . && git commit -m patch-version && git push --tags && npm run build && npm publish",
     "build": "npm run clean && npm run test && npm run format && npm run lint && rollup -c",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint src/**/*.ts --fix"
