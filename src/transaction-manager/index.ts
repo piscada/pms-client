@@ -1,7 +1,5 @@
 import { TypedEmitter as EventEmitter } from 'tiny-typed-emitter'
 
-// WIRE PROTOCOL
-
 type CommandWireMessage = {
   type: 'cmd'
   namespace?: string
@@ -152,6 +150,9 @@ class TransactionManager<
     //   CommandWireMessage | ResponseWireMessage | EventWireMessage
 
       try {
+
+        if (msg.utf8Data) {
+
         message = JSON.parse(msg as string) //msg.utf8Data || msg.data || msg
       } catch (e) {
         return
