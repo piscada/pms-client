@@ -451,7 +451,7 @@ export default class PeerConnectionClient {
       }
     }
     // If we have to override codec
-    if (params?.codecs)
+    if (params && params.codecs)
       // Set it on transceicer
       transceiver.codecs = params.codecs
 
