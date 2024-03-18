@@ -320,7 +320,10 @@ export default class PeerConnectionClient {
         else this.forceSDPMunging = false
       }
     }
-    if (params?.codecs) transceiver.codecs = params.codecs
+    // If we have to override codec
+    if (params && params.codecs)
+      // Set it on transceicer
+      transceiver.codecs = params.codecs
 
     transceiver.pending = true
     this.pending.add(transceiver)

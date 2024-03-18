@@ -1,1 +1,1 @@
-export default {buildDate: "28-02-2024_23:45:57", version: "2.6.93"}
+export default {buildDate: "06-03-2024_14:45:10", version: "2.6.94"}
