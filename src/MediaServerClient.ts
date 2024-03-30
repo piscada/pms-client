@@ -1,11 +1,12 @@
 import { SDPInfo } from 'semantic-sdp'
-import PeerConnectionClient from './PeerConnectionClient.js'
+import PeerConnectionClient from './PeerConnectionClient'
 import {
   TransactionManager,
   Namespace,
   AllowedMessages,
   Event
 } from './transaction-manager'
+import { SDPInfoParams } from 'semantic-sdp/dist/SDPInfo'
 
 type Options = {
   sdpSemantics?: string
@@ -13,9 +14,8 @@ type Options = {
   forceSDPMunging?: boolean
 }
 
-interface createResponse {
+interface MedoozeSDPInfoParams extends SDPInfoParams {
   id: string
-  sdp: string
 }
 
 export default class MediaServerClient {
@@ -87,7 +87,7 @@ export default class MediaServerClient {
     await pc.setLocalDescription(offer)
 
     // Connect
-    const remote: createResponse = await this.ns.cmd(
+    const remote: MedoozeSDPInfoParams = await this.ns.cmd(
       'create',
       localInfo.plain()
     )

@@ -1,4 +1,4 @@
-import { snack, debug, success, error as errorMsg } from '@piscada/snackbar'
+import { debug, success, error as errorMsg } from '@piscada/snackbar'
 import { TransactionManager } from './transaction-manager'
 import { PmsCameraItem, fetchAllCamerasWithInstances } from './api'
 import yaps from './yaps'
@@ -99,7 +99,7 @@ export class PMSConnector {
         }
 
         this.ws.onclose = () => {
-          snack.error('Websocket closed')
+          errorMsg('Websocket closed')
           if (this.settings.retries > 0) {
             this.reconnectWebSocket(this.settings)
           } else {

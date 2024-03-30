@@ -1,28 +1,94 @@
-import { SDPInfo, StreamInfo, TrackInfo } from 'semantic-sdp'
+import { SDPInfo, SDPInfoParams, StreamInfo, TrackInfo } from 'semantic-sdp'
+import {
+  AllowedMessages,
+  Namespace,
+  Event as TmEvent
+} from './transaction-manager'
+import { TrackInfoLike } from 'semantic-sdp/dist/TrackInfo'
 
+interface MedoozeTrackInfo extends TrackInfo {
+  streams?: readonly MediaStream[]
+}
+
+type MedoozeRTCRtpSender = RTCRtpSender & {
+  trackInfo?: MedoozeTrackInfo
+  streamId?: string
+}
+
+type MedoozeRTCRtpTransceiver = RTCRtpTransceiver & {
+  pending?: boolean
+  stopped?: boolean
+  trackInfo?: MedoozeTrackInfo
+  streamId?: string
+  trackId?: string
+  fixSimulcastEncodings?: RTCRtpEncodingParameters[]
+  sender?: MedoozeRTCRtpTransceiver
+  codecs?: string[]
+}
+
+export interface MedoozeRTCTrackEvent extends Event {
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCTrackEvent/receiver) */
+  readonly receiver: RTCRtpReceiver
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCTrackEvent/streams) */
+  readonly streams: ReadonlyArray<MediaStream>
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCTrackEvent/track) */
+  readonly track: MediaStreamTrack
+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCTrackEvent/transceiver) */
+  transceiver: MedoozeRTCRtpTransceiver
+  remoteStreamId?: string
+  remoteTrackId?: string
+}
+
+interface MedoozeRTCTrackEventInit extends EventInit {
+  receiver: RTCRtpReceiver
+  streams?: MediaStream[]
+  track: MediaStreamTrack
+  transceiver: MedoozeRTCRtpTransceiver
+  remoteStreamId?: string
+  remoteTrackId?: string
+}
+
+declare const MedoozeRTCTrackEvent: {
+  prototype: MedoozeRTCTrackEvent
+  new (
+    type: string,
+    eventInitDict: MedoozeRTCTrackEventInit
+  ): MedoozeRTCTrackEvent
+}
+
+export type SdpString = string
+
+export type PeerConnectionParams = {
+  id: string
+  ns: Namespace<string, AllowedMessages>
+  pc: RTCPeerConnection
+  remote: SDPInfoParams
+  localInfo: SDPInfo
+  strictW3C: boolean
+  forceSDPMunging: boolean
+  forceRenegotiation: boolean
+}
 // cSpell:disable
 
 export default class PeerConnectionClient {
   id: string
-  ns: any
-  pc: any
-  remote: any
-  localInfo: any
-  remoteInfo: any
-  streams: any
+  ns: Namespace<string, AllowedMessages>
+  pc: RTCPeerConnection
+  remote: SDPInfoParams
+  localInfo: SDPInfo
+  remoteInfo: SDPInfo
+  streams: Record<string, StreamInfo>
   strictW3C: boolean
   forceSDPMunging: boolean
   forceRenegotiation: boolean
-  pending: Set<any>
-  processing: Set<any>
+  pending: Set<MedoozeRTCRtpTransceiver>
   renegotiating: boolean
-  adding: Set<any>
-  removing: Set<any>
-  ontrack: (event: any) => void
-  ontrackended: (event: any) => void
-  onstatsended: (event: any) => void
+  adding: Set<MedoozeRTCRtpTransceiver>
+  removing: Set<MedoozeRTCRtpTransceiver>
+  ontrack: (event: MedoozeRTCTrackEvent) => void
+  ontrackended: (event: MedoozeRTCTrackEvent) => void
 
-  constructor(params: any) {
+  constructor(params: PeerConnectionParams) {
     // Initialize properties
     this.id = params.id
     this.ns = params.ns
@@ -34,26 +100,26 @@ export default class PeerConnectionClient {
     this.strictW3C = params.strictW3C
     this.forceSDPMunging = params.forceSDPMunging
     this.forceRenegotiation = params.forceRenegotiation
-    this.pending = new Set()
-    this.processing = new Set()
+    this.pending = new Set<MedoozeRTCRtpTransceiver>()
     this.renegotiating = false
-    this.adding = new Set()
-    this.removing = new Set()
+    this.adding = new Set<MedoozeRTCRtpTransceiver>()
+    this.removing = new Set<MedoozeRTCRtpTransceiver>()
 
     // Disable all existing transceivers
-    this.pc.getTransceivers().forEach((transceiver: any) => {
-      transceiver.direction = 'inactive'
-      transceiver.pending = true
-      this.pending.add(transceiver)
-    })
+    this.pc
+      .getTransceivers()
+      .forEach((transceiver: MedoozeRTCRtpTransceiver) => {
+        transceiver.direction = 'inactive'
+        transceiver.pending = true
+        this.pending.add(transceiver)
+      })
 
     // Dummy events
     this.ontrack = (event) => console.log('ontrack', event)
     this.ontrackended = (event) => console.log('ontrackended', event)
-    this.onstatsended = (event) => console.log('onstatsended', event) // Deprecated? Not used anymore?
 
     // Forward events
-    this.pc.ontrack = (event: any) => {
+    this.pc.ontrack = (event: MedoozeRTCTrackEvent) => {
       event.transceiver.trackInfo.streams = event.streams
       event.remoteStreamId = event.transceiver.streamId
       event.remoteTrackId = event.transceiver.trackId
@@ -64,26 +130,22 @@ export default class PeerConnectionClient {
       }
     }
 
-    this.pc.onstatsended = (event: any) => {
-      try {
-        this.onstatsended(event)
-      } catch (e) {
-        console.error(e)
-      }
+    this.pc.getTransceivers = () => {
+      return this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]
     }
 
     this.pc.onnegotiationneeded = () => this.renegotiate()
 
     // Listen for events
-    this.ns.on('event', (event: any) => {
+    this.ns.on('event', (event: TmEvent) => {
       const data = event.data
       switch (event.name) {
         case 'addedtrack':
-          this.adding.add(data)
+          this.adding.add(data as MedoozeRTCRtpTransceiver)
           this.renegotiate()
           break
         case 'removedtrack':
-          this.removing.add(data)
+          this.removing.add(data as MedoozeRTCRtpTransceiver)
           this.renegotiate()
           break
         case 'stopped':
@@ -105,9 +167,9 @@ export default class PeerConnectionClient {
 
     // Process additions first
     for (const data of this.adding) {
-      let transceiver
-      const trackInfo = TrackInfo.expand(data.track)
-      for (const reused of this.pc.getTransceivers()) {
+      let transceiver: MedoozeRTCRtpTransceiver
+      const trackInfo: MedoozeTrackInfo = TrackInfo.expand(data.track)
+      for (const reused of this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]) {
         if (
           reused.receiver.track.kind === trackInfo.getMedia() &&
           reused.direction === 'inactive' &&
@@ -120,9 +182,10 @@ export default class PeerConnectionClient {
         }
       }
       if (!transceiver)
+        // MedoozeRTCRtpTransceiver
         transceiver = this.pc.addTransceiver(trackInfo.getMedia(), {
           direction: 'recvonly'
-        })
+        }) as MedoozeRTCRtpTransceiver
 
       let stream = this.streams[data.streamId]
       if (!stream)
@@ -142,7 +205,7 @@ export default class PeerConnectionClient {
       const streamInfo = this.streams[data.streamId]
       const trackInfo = streamInfo.getTrack(data.trackId)
       const mid = trackInfo.getMediaId()
-      for (const transceiver of this.pc.getTransceivers()) {
+      for (const transceiver of this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]) {
         if (
           !transceiver.pending &&
           transceiver.mid &&
@@ -154,7 +217,7 @@ export default class PeerConnectionClient {
             delete this.streams[transceiver.streamId]
           try {
             this.ontrackended(
-              new (RTCTrackEvent || Event)('trackended', {
+              new MedoozeRTCTrackEvent('trackended', {
                 receiver: transceiver.receiver,
                 track: transceiver.receiver.track,
                 streams: trackInfo.streams,
@@ -177,7 +240,7 @@ export default class PeerConnectionClient {
 
     const processing = this.pending
     this.pending = new Set()
-    const transceivers = this.pc.getTransceivers()
+    const transceivers = this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]
 
     if (this.pc.signalingState !== 'have-local-offer') {
       const offer = await this.pc.createOffer()
@@ -208,15 +271,15 @@ export default class PeerConnectionClient {
 
     this.remoteInfo = this.localInfo.answer(this.remote)
 
-    for (const transceiver of this.pc.getTransceivers()) {
+    for (const transceiver of this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]) {
       if (transceiver.codecs && transceiver.mid) {
         const localMedia = this.localInfo.getMediaById(transceiver.mid)
         const capabilities = this.remote.capabilities[localMedia.getType()]
         if (!capabilities) continue
-        const cloned = Object.assign({}, capabilities)
+        const cloned = { ...capabilities }
         cloned.codecs = []
         for (const codec of transceiver.codecs)
-          for (const supported of capabilities.codecs)
+          for (const supported of capabilities.codecs as string[])
             if (codec.toLowerCase() === supported.split(';')[0].toLowerCase())
               cloned.codecs.push(supported)
         const answer = localMedia.answer(cloned)
@@ -253,7 +316,7 @@ export default class PeerConnectionClient {
 
     for (const stream of Object.values(this.streams)) {
       const cloned = new StreamInfo(stream.getId())
-      for (const [trackId, track] of stream.getTracks())
+      for (const [_, track] of stream.getTracks())
         if (track.getMediaId()) cloned.addTrack(track)
       this.remoteInfo.addStream(cloned)
     }
@@ -277,27 +340,27 @@ export default class PeerConnectionClient {
       this.renegotiate()
   }
 
-  getStats(selector: any) {
+  getStats(selector: MediaStreamTrack | null) {
     return this.pc.getStats(selector)
   }
 
-  async addTrack(track: any, stream: any, params: any) {
-    let transceiver
+  async addTrack(track: string | MediaStreamTrack, stream: any, params: any) {
+    let transceiver: MedoozeRTCRtpTransceiver
     let force = this.forceRenegotiation
-    const sendEncodings = params?.encodings || []
+    const sendEncodings: RTCRtpEncodingParameters[] = params?.encodings || []
 
     try {
       transceiver = this.pc.addTransceiver(track, {
         direction: 'sendonly',
         streams: stream ? [stream] : [],
         sendEncodings: !this.forceSDPMunging ? sendEncodings : undefined
-      })
+      }) as MedoozeRTCRtpTransceiver
     } catch (e) {
       if (this.strictW3C) throw e
       transceiver = this.pc.addTransceiver(track, {
         direction: 'sendonly',
         streams: stream ? [stream] : []
-      })
+      }) as MedoozeRTCRtpTransceiver
     }
 
     transceiver.sender.streamId = stream ? stream.id : '-'
@@ -305,7 +368,13 @@ export default class PeerConnectionClient {
     if (!this.strictW3C)
       try {
         if (sendEncodings.length) {
-          await transceiver.sender.setParameters({ encodings: sendEncodings })
+          await transceiver.sender.setParameters({
+            encodings: sendEncodings,
+            transactionId: '',
+            codecs: [],
+            headerExtensions: [],
+            rtcp: undefined
+          })
           force = true
         }
       } catch (e) {
@@ -332,8 +401,9 @@ export default class PeerConnectionClient {
     return transceiver.sender
   }
 
-  removeTrack(sender: any) {
-    for (const transceiver of this.pc.getTransceivers()) {
+  removeTrack(sender: TrackInfo) {
+    // INCOMPLETE? NEver used?
+    for (const transceiver of this.pc.getTransceivers() as MedoozeRTCRtpTransceiver[]) {
       if (transceiver.sender === sender) {
         transceiver.pending = true
         this.pending.add(transceiver)
@@ -357,7 +427,7 @@ function getNextSSRC() {
   return ++ssrcGen
 }
 
-function fixLocalSDP(sdp: any, transceivers: any) {
+function fixLocalSDP(sdp: SdpString, transceivers: MedoozeRTCRtpTransceiver[]) {
   let ini = sdp.indexOf('\r\nm=')
   let fixed = sdp.substr(0, ini !== -1 ? ini + 2 : ini)
 
@@ -367,9 +437,13 @@ function fixLocalSDP(sdp: any, transceivers: any) {
     ini = end
 
     const fixSimulcastEncodings = transceiver.fixSimulcastEncodings
-      ? transceiver.fixSimulcastEncodings.sort((a: any, b: any) => {
-          return (b.scaleResolutionDownBy || 1) - (a.scaleResolutionDownBy || 1)
-        })
+      ? transceiver.fixSimulcastEncodings.sort(
+          (a: RTCRtpEncodingParameters, b: RTCRtpEncodingParameters) => {
+            return (
+              (b.scaleResolutionDownBy || 1) - (a.scaleResolutionDownBy || 1)
+            )
+          }
+        )
       : null
 
     if (fixSimulcastEncodings && !fixSimulcastEncodings.inited) {
@@ -440,7 +514,9 @@ function fixLocalSDP(sdp: any, transceivers: any) {
       media += 'a=ssrc-group:SIM ' + ssrcs.join(' ') + '\r\n'
       media +=
         'a=simulcast:send ' +
-        fixSimulcastEncodings.map((e: any) => e.rid).join(';') +
+        fixSimulcastEncodings
+          .map((e: RTCRtpEncodingParameters) => e.rid)
+          .join(';') +
         '\r\n'
       for (let i = 0; i < fixSimulcastEncodings.length; ++i) {
         media +=
@@ -452,21 +528,6 @@ function fixLocalSDP(sdp: any, transceivers: any) {
       }
       media += 'a=x-google-flag:conference\r\n'
       fixSimulcastEncodings.inited = true
-    } else if (fixSimulcastEncodings && !fixSimulcastEncodings.inited) {
-      media +=
-        'a=simulcast:send ' +
-        fixSimulcastEncodings.map((e: any) => e.rid).join(';') +
-        '\r\n'
-      for (let i = 0; i < fixSimulcastEncodings.length; ++i) {
-        media +=
-          'a=rid:' +
-          fixSimulcastEncodings[i].rid +
-          ' send ssrc=' +
-          ssrcs[i] +
-          '\r\n'
-      }
-      media += 'a=x-google-flag:conference\r\n'
-    } else {
     }
     if (transceiver.codecs)
       for (const codec of ['vp8', 'vp9', 'h264'])
@@ -481,8 +542,8 @@ function fixLocalSDP(sdp: any, transceivers: any) {
   return fixed
 }
 
-function removeCodec(orgsdp: any, codec: any) {
-  const internalFunc = function (sdp: any) {
+function removeCodec(orgsdp: string, codec: string) {
+  const internalFunc = function (sdp: string) {
     const codecre = new RegExp(
       '(a=rtpmap:(\\d*) ' + codec + '/90000\\r\\n)',
       'i'

@@ -1,16 +1,18 @@
 import { TypedEmitter as EventEmitter } from 'tiny-typed-emitter'
 
+export type UnknownData = string | Date | Array<unknown> | object
+
 type CommandWireMessage = {
   type: 'cmd'
   namespace?: string
   name: string
-  data: unknown
+  data: UnknownData
   transId: number
 }
 
 type ResponseWireMessage = {
   type: 'error' | 'response'
-  data: unknown
+  data: UnknownData
   transId: number
 }
 
@@ -18,7 +20,7 @@ type EventWireMessage = {
   type: 'event'
   namespace?: string
   name: string
-  data: unknown
+  data: UnknownData
 }
 
 type WireMessage = CommandWireMessage | ResponseWireMessage | EventWireMessage
@@ -27,28 +29,28 @@ type WireMessage = CommandWireMessage | ResponseWireMessage | EventWireMessage
 
 type CommandAcceptRejectFn = (data: never) => void
 
-type Command<T = unknown> = {
-  namespace?: string
+type Command<T = UnknownData> = {
+  namespace: string
   name: string
   data: T
   accept: CommandAcceptRejectFn
   reject: CommandAcceptRejectFn
 }
 
-type Event<T = unknown> = {
-  namespace?: string
+export type Event<T = UnknownData> = {
+  namespace: string
   name: string
   data: T
 }
 
-type UnknownCommand = Command<unknown>
+type UnknownCommand = Command<UnknownData>
 
-type AllowedMessagesDirection = {
+export type AllowedMessagesDirection = {
   cmd: UnknownCommand
   event: Event
 }
 
-type AllowedMessages = {
+export type AllowedMessages = {
   rx: AllowedMessagesDirection
   tx: AllowedMessagesDirection
 }
@@ -96,8 +98,8 @@ class Namespace<
 }
 
 type Transaction = {
-  resolve: (data: unknown) => void
-  reject: (data: unknown) => void
+  resolve: (data: UnknownData) => void
+  reject: (data: UnknownData) => void
 }
 
 type TransactionManagerEvents<TMsg extends AllowedMessages> = {
@@ -117,13 +119,15 @@ type TransportEventMethod = (
   listener: (msg: TransportMessage) => void
 ) => void
 
-type Transport = { send(data: string): void } & (
-  | {
-      addEventListener: TransportEventMethod
-      removeEventListener: TransportEventMethod
-    }
-  | { addListener: TransportEventMethod; removeListener: TransportEventMethod }
-)
+type Transport = { send(data: string): void } & {
+  addEventListener?: TransportEventMethod
+  removeEventListener?: TransportEventMethod
+  // OR
+  addListener?: TransportEventMethod
+  removeListener?: TransportEventMethod
+}
+
+// type N = string
 
 class TransactionManager<
   TMsg extends AllowedMessages = {
@@ -147,24 +151,20 @@ class TransactionManager<
     this.listener = (msg) => {
       let message: WireMessage
 
-    //   CommandWireMessage | ResponseWireMessage | EventWireMessage
+      //   CommandWireMessage | ResponseWireMessage | EventWireMessage
 
       try {
-
-        if (msg.utf8Data) {
-
-        message = JSON.parse(msg as string) //msg.utf8Data || msg.data || msg
+        message = this.messageParser(msg)
       } catch (e) {
         return
       }
-
       switch (message.type) {
         case 'cmd': {
           const { transId } = message
           const cmd: Command = {
             name: message.name,
             data: message.data,
-            namespace: message.namespace,
+            namespace: message?.namespace,
             accept: (data) => {
               this._send({
                 type: 'response',
@@ -234,12 +234,29 @@ class TransactionManager<
     this.transport.send(JSON.stringify(msg))
   }
 
+  protected messageParser(msg: TransportMessage): WireMessage {
+
+    // ORIGINAL parser is:
+    // message = JSON.parse(msg.utf8Data || msg.data || msg)
+
+    // Trying with typescript.
+    // Note: 1. the commented out lines cannot be parsed. 
+    // Check for future fixes or ask Sergio if they are used accordingly.
+    // https://github.com/medooze/transaction-manager
+
+    if (typeof msg === 'string') return JSON.parse(msg)
+    // if ('data' in msg) return JSON.parse(msg.data)
+    if ('utf8Data' in msg) return JSON.parse(msg.utf8Data)
+    // if ('binaryData' in msg) return JSON.parse(msg.binaryData.toString())
+    throw new Error('Bad message')
+  }
+
   cmd<N extends string, K extends TMsg['tx']['cmd']['name']>(
     name: K,
-    data: (TMsg['tx']['cmd'] & { namespace: N; name: K })['data'],
+    data: (TMsg['tx']['cmd'] & { namespace?: N; name: K })['data'],
     namespace?: N
   ): Promise<
-    Parameters<(TMsg['tx']['cmd'] & { namespace: N; name: K })['accept']>[0]
+    Parameters<(TMsg['tx']['cmd'] & { namespace?: N; name: K })['accept']>[0]
   > {
     return new Promise((resolve, reject) => {
       if (!name || name.length === 0) throw new Error('Bad command name')
@@ -282,7 +299,7 @@ class TransactionManager<
     this._send(event)
   }
 
-  namespace<N extends string>(ns: N): Namespace<N, TMsg> {
+  namespace(ns: string): Namespace<string, TMsg> {
     let namespace = this.namespaces.get(ns)
     if (namespace) return namespace
     namespace = new Namespace(ns, this)

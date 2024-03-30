@@ -2,7 +2,7 @@ import { info, success } from '@piscada/snackbar'
 import MediaServerClient from './MediaServerClient'
 import yaps from './yaps'
 import { TransactionManager } from './transaction-manager'
-import PeerConnectionClient from './PeerConnectionClient'
+import PeerConnectionClient, { MedoozeRTCTrackEvent } from './PeerConnectionClient'
 import { PMSConnector } from './MedoozeConnector'
 
 interface PlayerConfig {
@@ -110,7 +110,7 @@ export default class MedoozePlayer {
     const pcc: PeerConnectionClient = await cli.createManagedPeerConnection()
 
     // On new remote tracks
-    pcc.ontrack = (event) => {
+    pcc.ontrack = (event: MedoozeRTCTrackEvent) => {
       if (event.remoteTrackId === camId) {
         const track = event.track
         this.stream = new MediaStream([track])
@@ -120,7 +120,7 @@ export default class MedoozePlayer {
     }
 
     // On remote track ended
-    pcc.ontrackended = (event) => {
+    pcc.ontrackended = (event: MedoozeRTCTrackEvent) => {
       if (event.track.id === this.trackId) {
         this.stream = null
         this.trackId = null
