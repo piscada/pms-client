@@ -61,21 +61,6 @@ export default class MediaServerClient {
     // Add sendonly transceivers for getting full codec capabilities
     pc.addTransceiver('video', { direction: 'sendonly' })
 
-    // Hack for firefox to retrieve all the header extensions
-    // try {
-    //   const val = await video.sender.setParameters({
-    //     encodings: [{ rid: 'a' }, { rid: 'b', scaleResolutionDownBy: 2.0 }],
-    //     transactionId: '',
-    //     codecs: [],
-    //     headerExtensions: [],
-    //     rtcp: undefined
-    //   })
-
-    //   console.log(val)
-    // } catch (e) {
-    //   console.log('Error setting parameters with firefox')
-    //   console.log(e)
-    // }
 
     // Create offer
     const offer = await pc.createOffer()
