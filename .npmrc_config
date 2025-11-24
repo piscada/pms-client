@@ -1,6 +1,1 @@
 registry=https://registry.npmjs.org/
-
-# Only for @piscada/pkg
-@piscada:registry=https://nexus.piscada.tools/repository/npm-hosted/
-
-//nexus.piscada.tools/repository/npm-hosted/:_auth=${NEXUS_AUTH}
