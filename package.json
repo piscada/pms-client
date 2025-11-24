@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://magnuguli@bitbucket.org/teampiscadacloud/pms-client.git"
+    "url": "git+https://github.com/piscada/pms-client.git"
   },
   "keywords": [
     "pms-client",
@@ -27,9 +27,9 @@
   ],
   "author": "Magnus Gule",
   "license": "UNLICENSED",
-  "homepage": "https://bitbucket.org/teampiscadacloud/pms-client#readme",
+  "homepage": "https://github.com/piscada/pms-client#readme",
   "dependencies": {
-    "@piscada/snackbar": "^1.0.18",
+    "@piscada/snackbar": "^1.0.21",
     "semantic-sdp": "^3.27.1",
     "tiny-typed-emitter": "^2.1.0"
   },
@@ -62,9 +62,9 @@
     "typescript-eslint": "^7.0.2"
   },
   "publishConfig": {
-    "registry": "https://nexus.piscada.tools/repository/npm-hosted/"
+    "access": "public"
   },
   "bugs": {
-    "url": "https://bitbucket.org/teampiscadacloud/pms-client/issues"
+    "url": "https://github.com/piscada/pms-client/issues"
   }
 }
